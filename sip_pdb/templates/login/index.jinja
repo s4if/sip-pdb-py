@@ -1,0 +1,21 @@
+{% extends "login/layout.jinja" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="col">
+		<form method="POST" action="{{ url_for('auth.login') }}">
+		  <div class="mb-3">
+		    <label class="form-label">Username</label>
+		    <input type="text" name="username" class="form-control" >
+		  </div>
+		  <div class="mb-3">
+		    <label lass="form-label">Password</label>
+		    <input type="password" name="password" class="form-control">
+		  </div>
+		  <button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+	</div>
+</div>
+{% endblock %}

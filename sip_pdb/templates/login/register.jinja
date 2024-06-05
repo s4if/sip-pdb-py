@@ -1,0 +1,82 @@
+{% extends "login/layout.jinja" %}
+
+{% block title %}Daftar{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="col">
+		<form method="POST" action="{{ url_for('auth.register')}}" hx-boost="false">
+		  <div class="mb-3">
+		    <label class="form-label">Username</label>
+		    <input type="text" name="username" class="form-control" maxlength="15" >
+		  </div>
+          <div class="mb-3">
+		    <label class="form-label">Nama Lengkap</label>
+		    <input type="text" name="nama" class="form-control" >
+		  </div>
+          <div class="mb-3">
+		    <label class="form-label">Asal Sekolah</label>
+		    <input type="text" name="asal_sekolah" class="form-control" >
+		  </div>
+          <div class="mb-3">
+		    <label class="form-label">NISN</label>
+		    <input type="text" name="nisn" class="form-control" >
+		  </div>
+          <div class="mb-3">
+		    <label class="form-label">Nomor Telepon</label>
+		    <input type="text" name="no_hp" class="form-control" >
+		  </div>
+          <div class="mb-3">
+		    <label class="form-label">Jenis Kelamin</label>
+            <div class="form-check">
+            <input class="form-check-input" type="radio" name="jenis_kelamin" value="L" id="radio_l">
+            <label class="form-check-label" for="radio_l">
+                Laki-laki
+            </label>
+            </div>
+            <div class="form-check">
+            <input class="form-check-input" type="radio" name="jenis_kelamin" value="P" id="radio_p">
+            <label class="form-check-label" for="radio_p">
+                Perempuan
+            </label>
+            </div>
+		  </div>
+          <div class="mb-3">
+            <label class="form-label">Jalur Seleksi Pendaftaran</label>
+            <select class="form-select" name="jalur_seleksi">
+                <option value="Jalur Reguler">Jalur Reguler</option>
+                <option value="Jalur Beasiswa Dhuafa">Jalur Beasiswa Dhuafa</option>
+                <option value="Jalur Beasiswa Prestasi Nasional">Jalur Beasiswa Prestasi Nasional</option>
+                <option value="Jalur Beasiswa Prestasi Provinsi">Jalur Beasiswa Prestasi Provinsi</option>
+                <option value="Jalur Beasiswa Hafidz 10 Juz">Jalur Beasiswa Tahfidz 10 Juz</option>
+                <option value="Jalur Beasiswa Hafidz 20 Juz">Jalur Beasiswa Tahfidz 20 Juz</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Program Pendidikan</label>
+            <select class="form-select" name="program">
+                <option value="Reguler">Kelas Reguler</option>
+                <option value="Industri">Kelas Industri</option>
+            </select>
+          </div>
+		  <div class="mb-3">
+		    <label class="form-label">Password</label>
+		    <input type="password" name="password" class="form-control">
+		  </div>
+          <div class="mb-3">
+		    <label class="form-label">Konfirmasi Password</label>
+		    <input type="password" name="konfirm_password" class="form-control">
+		  </div>
+          <div class="mb-3">
+            <label class="form-label">Gambar Captcha: </label>
+            <!-- <img src="" id="capt_img" class="img-responsive" alt="captcha"> -->
+          </div>
+          <div class="mb-3">
+		    <label class="form-label">Input Captcha</label>
+		    <input type="number" name="captcha" class="form-control" >
+		  </div>
+		  <button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+	</div>
+</div>
+{% endblock %}

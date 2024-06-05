@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# disable all cache
+**/__pycache__/
+
 # C extensions
 *.so
 
