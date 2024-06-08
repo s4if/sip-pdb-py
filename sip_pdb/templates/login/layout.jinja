@@ -43,17 +43,36 @@
   </div>
 </nav>
     <div class="container" id="containerx">
+    {% if error %}
     <div class="row">
       <div class="col">
-        {% block alerts %} {% endblock %}
-        {% if error %}
           <div class="alert alert-warning alert-dismissible fade show" role="alert">
             {{ error }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
-        {% endif %}
       </div>
     </div>
+    {% endif %}
+    {% if success %}
+    <div class="row">
+      <div class="col">
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ success }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+      </div>
+    </div>
+    {% endif %}
+    {% if info %}
+    <div class="row">
+      <div class="col">
+          <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            {{ info }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+      </div>
+    </div>
+    {% endif %}
     {% block content %} {% endblock %}
     </div>
 </body>

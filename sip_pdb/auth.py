@@ -4,6 +4,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
 from werkzeug.security import check_password_hash, generate_password_hash
+from .db import db
 
 bp = Blueprint('auth', __name__)
 
@@ -12,22 +13,42 @@ bp = Blueprint('auth', __name__)
 def register():
     if request.method == 'GET':
         return render_template('login/register.jinja')
-    else:
-        username = request.form['username']
-        password = request.form['password']
-        return username + " "+password
+    
+    if request.form['password'] != request.form['confirm_password']:
+        error = 'Password tidak cocok'
+        return render_template('login/register.jinja', error=error)
+    # TODO: buka dokumentasi kemudian sempurnakan dengan hash yang lebih aman
+    hashed_password = generate_password_hash(request.form['password'], method='pbkdf2:sha256', salt_length=16) 
+    from .models import Registrant
+    r = Registrant()
+    r.username = request.form['username']
+    r.password = hashed_password
+    r.name = request.form['name']
+    r.gender = request.form['gender']
+    r.prev_school = request.form['prev_school']
+    r.nisn = request.form['nisn']
+    r.cp = request.form['cp']
+    r.program = request.form['program']
+    r.selection_path = request.form['selection_path']
+    r.entry_year = 2024 # sementara
+    r.gelombang = 1
+    r.registration_time = db.func.current_timestamp()
+    db.session.add(r)
+    db.session.commit()
+    success = "Registrasi berhasil. Silahkan login"
+    return render_template('login/index.jinja', success=success)
+        
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
         return render_template('login/index.jinja')
     else:
-        username = request.form['username']
-        password = request.form['password']
-
-        if username == 'admin' and check_password_hash(generate_password_hash('qwerty'), password):
+        from .models import Registrant
+        r = Registrant.query.filter_by(username=request.form['username']).first()
+        if r and check_password_hash(r.password, request.form['password']):
             # remember which user has logged in
-            session['user_id'] = username
+            session['user_id'] = r.username
             session['logged_in'] = True
             return redirect(url_for('home'))
         else:
