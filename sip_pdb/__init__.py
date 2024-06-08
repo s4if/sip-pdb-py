@@ -2,17 +2,12 @@ import os
 
 from flask import Flask, session, redirect, url_for
 from . import auth
+from werkzeug.security import check_password_hash, generate_password_hash
 from .config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from .db import db, init_app
 
-db = SQLAlchemy()
-migrate = Migrate()
-
-
-def init_app(app):
-    db.init_app(app)
-    migrate.init_app(app, db)
 
 def create_app(test_config=None):
     # create and configure the app
@@ -37,6 +32,10 @@ def create_app(test_config=None):
             return redirect(url_for('auth.login'))
 
         return 'Home'    
+    
+    @app.route('/hash/<string:password>')
+    def hash(password):
+        return generate_password_hash(password)
     
     app.register_blueprint(auth.bp)
 
