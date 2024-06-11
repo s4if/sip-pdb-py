@@ -4,6 +4,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
 from werkzeug.security import check_password_hash, generate_password_hash
+from sqlalchemy.exc import IntegrityError
 from .db import db
 
 bp = Blueprint('auth', __name__)
@@ -11,12 +12,16 @@ bp = Blueprint('auth', __name__)
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
+    from .forms import RegisterForm
     if request.method == 'GET':
-        return render_template('login/register.jinja')
+        form = RegisterForm()
+        return render_template('login/register.jinja', form = form)
     
-    if request.form['password'] != request.form['confirm_password']:
-        error = 'Password tidak cocok'
-        return render_template('login/register.jinja', error=error)
+    form = RegisterForm(request.form)
+    if not form.validate():
+        error="Registrasi gagal. Silahkan cek lagi data anda"
+        return render_template('login/register.jinja', form = form, error=error)
+        
     # TODO: buka dokumentasi kemudian sempurnakan dengan hash yang lebih aman
     hashed_password = generate_password_hash(request.form['password'], method='pbkdf2:sha256', salt_length=16) 
     from .models import Registrant
@@ -33,10 +38,17 @@ def register():
     r.entry_year = 2024 # sementara
     r.gelombang = 1
     r.registration_time = db.func.current_timestamp()
-    db.session.add(r)
-    db.session.commit()
-    success = "Registrasi berhasil. Silahkan login"
-    return render_template('login/index.jinja', success=success)
+
+    # commit ke database
+    try: 
+        db.session.add(r)
+        db.session.commit()
+        success = "Registrasi berhasil. Silahkan login"
+        return render_template('login/index.jinja',success=success)
+    except IntegrityError:
+        error="Registrasi gagal, ada data yang salah. Silahkan coba lagi"
+        form.username.errors.append('Username telah digunakan')
+        return render_template('login/register.jinja', form = form, error=error)
         
 
 @bp.route('/login', methods=['GET', 'POST'])

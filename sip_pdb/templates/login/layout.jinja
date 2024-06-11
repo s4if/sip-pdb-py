@@ -15,6 +15,21 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/htmx.min.js') }}"></script>
 </head>
 <body hx-boost="true" hx-push-url="true">
+
+{% macro render_field(field) %}
+  <div class="mb-3">
+    {{ field.label(class_='form-label') }}
+    {{ field(class_='form-control' + (' is-invalid' if field.errors else ''), **kwargs)|safe }}
+    {% if field.errors %}
+      <div class="invalid-feedback">
+        {% for error in field.errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+{% endmacro %}
+
 <nav class="navbar fixed-top navbar-expand-md navbar-dark bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">PPDB SMKITIF</a>
