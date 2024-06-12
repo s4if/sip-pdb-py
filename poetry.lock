@@ -92,6 +92,20 @@ async = ["asgiref (>=3.2)"]
 dotenv = ["python-dotenv"]
 
 [[package]]
+name = "flask-htmx"
+version = "0.3.2"
+description = "A Flask extension to work with HTMX."
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "flask_htmx-0.3.2-py3-none-any.whl", hash = "sha256:a1e0071216349197d6669662c2c35a1ab849b6fca28c89dc90932761f7e73c05"},
+    {file = "flask_htmx-0.3.2.tar.gz", hash = "sha256:8def77bb292369ff77513ff7b76d27b06f83e1d8c21165b6714c06c1cc2b9275"},
+]
+
+[package.dependencies]
+Flask = ">=2.0.2,<4.0.0"
+
+[[package]]
 name = "flask-migrate"
 version = "4.0.7"
 description = "SQLAlchemy database migrations for Flask applications using Alembic."
@@ -589,4 +603,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "743782ebfa2dcecdf1cafcb3125d440d7db67a64753a5dc709c9ce731881be78"
+content-hash = "34c9ed54f35104db0b8c0d33a94215c3a95e0f1f19c762e01c65ea8f28c5aa64"
