@@ -7,6 +7,10 @@ from .config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from .db import db, init_app
+from flask_wtf.csrf import CSRFProtect
+from .helper import login_required
+
+csrf = CSRFProtect()
 
 
 def create_app(test_config=None):
@@ -14,6 +18,7 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(Config)
     init_app(app)
+    csrf.init_app(app)
 
     # ensure the instance folder exists
     try:
@@ -27,10 +32,8 @@ def create_app(test_config=None):
         return 'Hello, World!'
     
     @app.route('/home')
+    @login_required
     def home():
-        if 'logged_in' not in session:
-            return redirect(url_for('auth.login'))
-
         return 'Home'    
     
     @app.route('/hash/<string:password>')

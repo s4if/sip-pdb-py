@@ -1,5 +1,3 @@
-import functools
-
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
@@ -9,19 +7,39 @@ from .db import db
 
 bp = Blueprint('auth', __name__)
 
+def create_captcha():
+    from random import randint
+    from captcha.image import ImageCaptcha
+    import base64
+    from io import BytesIO
+    
+    cap = ImageCaptcha()
+    cap_int = str(randint(10000, 99999))
+    session['captcha'] = cap_int
+    cap_bytes = BytesIO()
+    cap.write(str(cap_int), cap_bytes)
+    cap_str = base64.b64encode(cap_bytes.getvalue()).decode('utf-8')
+    return f"data:image/png;base64,{cap_str}"
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     from .forms import RegisterForm
+    cap_img = create_captcha()
     if request.method == 'GET':
         form = RegisterForm()
-        return render_template('login/register.jinja', form = form)
+        return render_template('login/register.jinja', form=form, cap_img=cap_img)
     
     form = RegisterForm(request.form)
     if not form.validate():
+        cap_img = create_captcha()
         error="Registrasi gagal. Silahkan cek lagi data anda"
-        return render_template('login/register.jinja', form = form, error=error)
+        return render_template('login/register.jinja', form = form, error=error, cap_img=cap_img)
         
+    if session['captcha'] != request.form['captcha']:
+        cap_img = create_captcha()
+        error="Registrasi gagal. Silahkan cek lagi data anda"
+        return render_template('login/register.jinja', form = form, error=error, cap_img=cap_img)
+    
     # TODO: buka dokumentasi kemudian sempurnakan dengan hash yang lebih aman
     hashed_password = generate_password_hash(request.form['password'], method='pbkdf2:sha256', salt_length=16) 
     from .models import Registrant
@@ -44,17 +62,20 @@ def register():
         db.session.add(r)
         db.session.commit()
         success = "Registrasi berhasil. Silahkan login"
-        return render_template('login/index.jinja',success=success)
+        return render_template('login/index.jinja',form = form, success=success)
     except IntegrityError:
+        cap_img = create_captcha()
         error="Registrasi gagal, ada data yang salah. Silahkan coba lagi"
         form.username.errors.append('Username telah digunakan')
-        return render_template('login/register.jinja', form = form, error=error)
+        return render_template('login/register.jinja', form = form, error=error, cap_img=cap_img)
         
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
+    from .forms import LoginForm
+    form = LoginForm(request.form)
     if request.method == 'GET':
-        return render_template('login/index.jinja')
+        return render_template('login/index.jinja', form=form)
     else:
         from .models import Registrant
         r = Registrant.query.filter_by(username=request.form['username']).first()
@@ -65,25 +86,9 @@ def login():
             return redirect(url_for('home'))
         else:
             error = 'Invalid username or password'
-            return render_template('login/index.jinja', error=error)
-
-
-@bp.before_app_request
-def load_logged_in_user():
-   pass
-
+            return render_template('login/index.jinja', form=form, error=error)
 
 @bp.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('auth.login'))
-
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
-
-        return view(**kwargs)
-
-    return wrapped_view

@@ -19,6 +19,10 @@ def validate_phone(form, field):
                 raise ValidationError('Invalid phone number.')
         except ValueError:
             raise ValidationError('Invalid phone number.')
+        
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
 
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=4, max=15)])
