@@ -1,0 +1,23 @@
+{% if not is_htmx %}
+    {% extends "registrant/layout.jinja" %}
+    {% block title %}Isi Data{% endblock %}
+{% else %}
+    <title>Isi Data</title>
+{% endif %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('registrant.beranda') }}">Beranda</a></li>
+        <li class="breadcrumb-item active">Isi Data</li>
+    </ol>
+</nav>
+<h1 class="h2">Isi Data Siswa</h1>
+<p>Isi Data Siswa Disini!</p>
+
+<div class="row">
+    <div class="<col>">
+        <p>Lorem Ipsum</p>
+    </div>
+</div>
+{% endblock %}

@@ -3,6 +3,10 @@
 import functools
 from flask import session, redirect, url_for
 
+from flask_htmx import HTMX
+
+htmx = HTMX()
+
 def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
