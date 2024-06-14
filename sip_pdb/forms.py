@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import  RadioField, SelectField, StringField, PasswordField, IntegerField
+from wtforms import  RadioField, SelectField, StringField, PasswordField, IntegerField, DateField
 from wtforms.validators import DataRequired, EqualTo, InputRequired, Length, ValidationError
 import phonenumbers
 
@@ -36,10 +36,61 @@ class RegisterForm(FlaskForm):
         ('Jalur Beasiswa Dhuafa', 'Jalur Beasiswa Dhuafa'),
         ('Jalur Beasiswa Prestasi Nasional', 'Jalur Beasiswa Prestasi Nasional'),
         ('Jalur Beasiswa Prestasi Provinsi', 'Jalur Beasiswa Prestasi Provinsi'),
-        ('Jalur Beasiswa Hafidz 10 Juz', 'Jalur Beasiswa Tahfidz 10 Juz'),
-        ('Jalur Beasiswa Hafidz 20 Juz', 'Jalur Beasiswa Tahfidz 20 Juz')
+        ('Jalur Beasiswa Tahfidz 10 Juz', 'Jalur Beasiswa Tahfidz 10 Juz'),
+        ('Jalur Beasiswa Tahfidz 20 Juz', 'Jalur Beasiswa Tahfidz 20 Juz')
     ], validators=[DataRequired()])
     program = SelectField('Program Pendidikan', choices=[('Reguler', 'Kelas Reguler'), ('Industri', 'Kelas Industri')], validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8)])
     confirm_password = PasswordField('Konfirmasi Password', validators=[DataRequired(), EqualTo('password')])
     captcha = IntegerField('Captcha', validators=[InputRequired()])
+    
+class RegistrantDataForm(FlaskForm):
+    nik = StringField('NIK', validators=[DataRequired(), Length(min=16, max=16)])
+    nkk = StringField('Nomor KK', validators=[DataRequired(), Length(min=16, max=16)])
+    nak = StringField('No. Akta Kelahiran', validators=[DataRequired(), Length(max=60)])
+    birth_place = StringField('Tempat lahir', validators=[DataRequired(), Length(max=60)])
+    birth_date = DateField('Tanggal Lahir', validators=[DataRequired()])
+    birth_order = IntegerField('Anak keberapa', validators=[DataRequired()])
+    siblings_count = IntegerField('Dari berapa bersaudara', validators=[DataRequired()])
+    street = StringField('Dusun', validators=[DataRequired()])
+    rt = IntegerField('RT')
+    rw = IntegerField('RW')
+    village = StringField('Kelurahan', validators=[DataRequired()])
+    district = StringField('Kecamatan', validators=[DataRequired()])
+    city = StringField('Kota', validators=[DataRequired()])
+    province = StringField('Provinsi', validators=[DataRequired()])
+    country = StringField('Negara', validators=[DataRequired()])
+    postal_code = IntegerField('Kode Pos', validators=[DataRequired()])
+    parent_status = SelectField('Status Ortu', validators=[DataRequired()], choices=[
+        ('Lengkap', 'Lengkap'),
+        ('Cerai', 'Cerai'),
+        ('Yatim', 'Yatim'),
+        ('Piatu', 'Piatu'),
+        ('Yatim Piatu', 'Yatim Piatu')
+    ])
+    nationality = SelectField('Kewarganegaraan', validators=[DataRequired()], choices=[
+        ('Warga Negara Indonesia', 'WNI'),
+        ('Warga Negara Asing', 'WNA')
+    ])
+    religion = SelectField('Agama', validators=[DataRequired()], choices=[
+        ('Islam', 'Islam'),
+        ('Kristen', 'Kriten'),
+        ('Katolik', 'Katolik'),
+        ('Hindu', 'Hindu'),
+        ('Budha', 'Budha'),
+        ('Konghucu', 'Konghucu'),
+        ('Penganut Kepercayaan', 'Penganut Kepercayaan')
+    ])
+    height = IntegerField('Tinggi', validators=[DataRequired()])
+    weight = IntegerField('Berat', validators=[DataRequired()])
+    head_size = IntegerField('Lingkar Kepala', validators=[DataRequired()])
+    stay_with = SelectField('Tinggal Bersama', validators=[DataRequired()], choices=[
+        ('Orang Tua', 'Orang Tua'),
+        ('Kakek Nenek','Kakek Nenek'),
+        ('Kerabat', 'Kerabat'),
+        ('Lainnya', 'Lainnya')
+    ])
+    #hobbies = StringField('Hobi')
+    #achievements = StringField('Prestasi')
+    #hospital_sheets = StringField('Riwayat Kesehatan')
+    #physical_abnormalities = StringField('Kelainan Jasmani')

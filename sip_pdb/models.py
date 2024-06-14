@@ -17,14 +17,14 @@ class Registrant(db.Model):
     username = db.Column(db.String(15), nullable=False, unique=True)
     reg_id = db.Column(db.String(15), nullable=True, unique=True)
     password = db.Column(db.String, nullable=False)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String(60), nullable=False)
     upload_dir = db.Column(db.String, nullable=True)
     gender = db.Column(db.String(10), nullable=False)
-    prev_school = db.Column(db.String, nullable=False)
-    nisn = db.Column(db.String, nullable=True)
-    cp = db.Column(db.String, nullable=True)
+    prev_school = db.Column(db.String(120), nullable=False)
+    nisn = db.Column(db.String(10), nullable=False)
+    cp = db.Column(db.String(18), nullable=False)
     program = db.Column(db.String(15), nullable=False)
-    selection_path = db.Column(db.String(15), nullable=False)
+    selection_path = db.Column(db.String(40), nullable=False)
     entry_year = db.Column(db.Integer, nullable=False)
     verified = db.Column(db.Boolean, nullable=False, default=False)
     finalized = db.Column(db.Boolean, nullable=False, default=False)
@@ -51,33 +51,33 @@ class Registrant(db.Model):
 class RegistrantData(db.Model):
     __tablename__ = 'registrant_data'
     id = db.Column(db.Integer, primary_key=True)
-    nik = db.Column(db.String(60), nullable=False)  # nomor induk kependudukan
-    nkk = db.Column(db.String(60), nullable=False)  # nomor kartu keluarga
-    nak = db.Column(db.String, nullable=False)  # nomor akte kelahiran
-    birth_place = db.Column(db.String, nullable=False)
+    nik = db.Column(db.String(16), nullable=False)  # nomor induk kependudukan
+    nkk = db.Column(db.String(16), nullable=False)  # nomor kartu keluarga
+    nak = db.Column(db.String(60), nullable=False)  # nomor akte kelahiran
+    birth_place = db.Column(db.String(60), nullable=False)
     birth_date = db.Column(db.Date, nullable=False)
-    birth_order = db.Column(db.String)  # anak ke...
-    siblings_count = db.Column(db.String)  # sekarang, jumlah saudara + si pendaftar
-    street = db.Column(db.String)  # dusun
-    rt = db.Column(db.Integer)  # rt
-    rw = db.Column(db.Integer)  # rw
+    birth_order = db.Column(db.Integer, nullable=False)  # anak ke...
+    siblings_count = db.Column(db.Integer, nullable=False)  # jumlah saudara + si pendaftar
+    street = db.Column(db.String, nullable=False)  # dusun
+    rt = db.Column(db.Integer, nullable=True)  # rt
+    rw = db.Column(db.Integer, nullable=True)  # rw
     village = db.Column(db.String, nullable=False)  # desa
     district = db.Column(db.String, nullable=False)  # kecamatan
     city = db.Column(db.String, nullable=False)  # kota
     province = db.Column(db.String, nullable=False)
-    country = db.Column(db.String)
-    postal_code = db.Column(db.String, nullable=False)
-    parent_status = db.Column(db.String, nullable=False)  # ortu lengkap, yatim, piatu, yatim piatu
-    nationality = db.Column(db.String, nullable=False)
-    religion = db.Column(db.String(10), nullable=False)
-    hospital_sheets = db.Column(db.String(1024))
-    physical_abnormalities = db.Column(db.String(1024))
+    country = db.Column(db.String, nullable=False)
+    postal_code = db.Column(db.Integer, nullable=False)
+    parent_status = db.Column(db.String(30), nullable=False)  # ortu lengkap, yatim, piatu, yatim piatu
+    nationality = db.Column(db.String(3), nullable=False) # WNI, WNA
+    religion = db.Column(db.String(20), nullable=False)
     height = db.Column(db.Integer, nullable=False)
     weight = db.Column(db.Integer, nullable=False)
     head_size = db.Column(db.Integer, nullable=False)
     stay_with = db.Column(db.String, nullable=False)  # tinggal dengan siapa
-    hobbies = db.Column(db.String(1024))
-    achievements = db.Column(db.String(1024))
+    hobbies = db.Column(db.JSON, nullable=False, default={})
+    achievements = db.Column(db.JSON, nullable=False, default={})
+    hospital_sheets = db.Column(db.JSON, nullable=False, default={})
+    physical_abnormalities = db.Column(db.JSON, nullable=False, default={})
     
     def __repr__(self):
         return '<User {}>'.format(self.name)
@@ -85,11 +85,11 @@ class RegistrantData(db.Model):
 class Parent(db.Model):
     __tablename__ = 'parents'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    type = db.Column(db.String, nullable=False) # tipe, Ayah, Ibu, Wali
-    name = db.Column(db.String, nullable=False)
-    nik = db.Column(db.String, nullable=False)
-    status = db.Column(db.String, nullable=False)  # Hidup, Cerai, Almarhum
-    birth_place = db.Column(db.String, nullable=False)
+    type = db.Column(db.String(4), nullable=False) # tipe, Ayah, Ibu, Wali
+    name = db.Column(db.String(60), nullable=False)
+    nik = db.Column(db.String(16), nullable=False)
+    status = db.Column(db.String(25), nullable=False)  # Hidup, Cerai, Almarhum
+    birth_place = db.Column(db.String(60), nullable=False)
     birth_date = db.Column(db.Date, nullable=False)
     street = db.Column(db.String)  # Dusun
     rt = db.Column(db.Integer)  # RT
@@ -100,7 +100,7 @@ class Parent(db.Model):
     province = db.Column(db.String, nullable=False)
     country = db.Column(db.String)
     postal_code = db.Column(db.Integer, nullable=False)
-    contact = db.Column(db.String)  # Nomor Telepon
+    contact = db.Column(db.String(18))  # Nomor Telepon
     relation = db.Column(db.String, nullable=False)  # Kandung, Tiri, Angkat
     nationality = db.Column(db.String, nullable=False)
     religion = db.Column(db.String, nullable=False)  # pake radio

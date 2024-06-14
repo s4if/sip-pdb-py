@@ -5,9 +5,11 @@
     <title>Isi Data</title>
 {% endif %}
 
+{% from 'macros.jinja' import render_field, render_select %}
+
 {% block content %}
 <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
+    <ol class="breadcrumb" hx-target="#hx_content" hx-swap="innerHTML" >
         <li class="breadcrumb-item"><a href="{{ url_for('registrant.beranda') }}">Beranda</a></li>
         <li class="breadcrumb-item active">Isi Data</li>
     </ol>
@@ -16,8 +18,57 @@
 <p>Isi Data Siswa Disini!</p>
 
 <div class="row">
-    <div class="<col>">
-        <p>Lorem Ipsum</p>
+	<div class="col-12">
+		<form method="POST" action="{{ url_for('registrant.isi_data')}}" hx-boost="false">
+		{{ form.csrf_token }}
+        {{ render_field(form.nik) }}
+        {{ render_field(form.nkk) }}
+        {{ render_field(form.nak) }}
+        {{ render_field(form.birth_place) }}
+        {{ render_field(form.birth_date) }}
+        {{ render_field(form.birth_order) }}
+        {{ render_field(form.siblings_count) }}
+        <hr>
+        {{ render_field(form.street) }}
+        {{ render_field(form.rt) }}
+        {{ render_field(form.rw) }}
+        {{ render_field(form.village) }}
+        {{ render_field(form.district) }}
+        {{ render_field(form.city) }}
+        {{ render_field(form.province) }}
+        {{ render_field(form.country) }}
+        {{ render_field(form.postal_code) }}
+        <hr>
+        <div class="row mb-3">
+            <label class="col-md-2 col-sm-3 col-form-label">Status Orang Tua</label>
+            <div class="col-md-8 col-sm-7">
+                {{ form.parent_status(class="form-select") }}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label class="col-md-2 col-sm-3 col-form-label">Kewarganegaraan</label>
+            <div class="col-md-8 col-sm-7">
+                {{ form.nationality(class="form-select") }}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label class="col-md-2 col-sm-3 col-form-label">Agama</label>
+            <div class="col-md-8 col-sm-7">
+                {{ form.religion(class="form-select") }}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label class="col-md-2 col-sm-3 col-form-label">Tinggal Bersama</label>
+            <div class="col-md-8 col-sm-7">
+                {{ form.stay_with(class="form-select") }}
+            </div>
+        </div>
+        {{ render_field(form.height) }}
+        {{ render_field(form.weight) }}
+        {{ render_field(form.head_size) }}
+        <!-- TODO: hobi, prestasi, catatan kesihatan, kelainan jasmani dibuat seperti ppdb lama! -->
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
     </div>
 </div>
 {% endblock %}

@@ -7,7 +7,7 @@
 
 {% block content %}
 <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
+    <ol class="breadcrumb" hx-target="#hx_content" hx-swap="innerHTML" >
         <li class="breadcrumb-item"><a href="{{ url_for('registrant.beranda') }}">Beranda</a></li>
         <li class="breadcrumb-item active">Isi Wali</li>
     </ol>
@@ -16,7 +16,7 @@
 <p>Isi Data Siswa Disini!</p>
 
 <div class="row">
-    <div class="<col>">
+    <div class="col">
         <p>Lorem Ipsum</p>
     </div>
 </div>

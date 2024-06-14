@@ -7,16 +7,16 @@
 
 {% block content %}
 <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
+    <ol class="breadcrumb" hx-target="#hx_content" hx-swap="innerHTML" >
         <li class="breadcrumb-item"><a href="{{ url_for('registrant.beranda') }}">Beranda</a></li>
         <li class="breadcrumb-item active">Isi Pernyataan</li>
     </ol>
 </nav>
 <h1 class="h2">Isi Pernyataan</h1>
+<!-- TODO: tampilan data awal + tombol upload foto dan scan dokumen -->
 <p>Isi Data Siswa Disini!</p>
-
 <div class="row">
-    <div class="<col>">
+    <div class="col">
         <p>Lorem Ipsum</p>
     </div>
 </div>

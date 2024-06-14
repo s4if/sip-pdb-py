@@ -32,6 +32,7 @@
         </div>
         {{ render_field(form.password) }}
         {{ render_field(form.confirm_password) }}
+        {% if not disable_captcha %}
         <div class="mb-3">
         <label class="form-label">Gambar Captcha: </label>
         <img src="{{ cap_img }}" id="capt_img" class="img-responsive" alt="captcha">
@@ -40,6 +41,7 @@
         <label class="form-label">Input Captcha</label>
         {{ form.captcha(class="form-control") }}
         </div>
+        {% endif %}
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
     </div>

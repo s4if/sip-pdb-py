@@ -46,6 +46,10 @@ def create_app(test_config=None):
         from flask import render_template
         return render_template('layout.jinja')
     
+    @app.route('/')
+    def root_dir():
+        return redirect(url_for('auth.login'))
+    
     app.register_blueprint(auth.bp)
     app.register_blueprint(registrant.bp)
     

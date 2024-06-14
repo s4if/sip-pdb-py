@@ -24,8 +24,8 @@ def create_captcha():
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     from .forms import RegisterForm
-    cap_img = create_captcha()
     if request.method == 'GET':
+        cap_img = create_captcha()
         form = RegisterForm()
         return render_template('login/register.jinja', form=form, cap_img=cap_img)
     
@@ -37,7 +37,7 @@ def register():
         
     if session['captcha'] != request.form['captcha']:
         cap_img = create_captcha()
-        error="Registrasi gagal. Silahkan cek lagi data anda"
+        error="Registrasi gagal. Kolom Captcha tidak sesuai"
         return render_template('login/register.jinja', form = form, error=error, cap_img=cap_img)
     
     # TODO: buka dokumentasi kemudian sempurnakan dengan hash yang lebih aman
@@ -75,15 +75,19 @@ def login():
     from .forms import LoginForm
     form = LoginForm(request.form)
     if request.method == 'GET':
+        # TODO: flash error dari login_required
         return render_template('login/index.jinja', form=form)
     else:
         from .models import Registrant
         r = Registrant.query.filter_by(username=request.form['username']).first()
         if r and check_password_hash(r.password, request.form['password']):
             # remember which user has logged in
-            session['user_id'] = r.username
+            session['user_id'] = r.id
+            session['username'] = r.username
+            session['name'] = r.name
             session['logged_in'] = True
-            return redirect(url_for('home'))
+            session['is_admin'] = False
+            return redirect(url_for('registrant.beranda'))
         else:
             error = 'Invalid username or password'
             return render_template('login/index.jinja', form=form, error=error)
