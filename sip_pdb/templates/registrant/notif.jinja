@@ -1,0 +1,29 @@
+{% if not is_htmx %}
+    {% extends "registrant/layout.jinja" %}
+    {% block title %}Notifikasi{% endblock %}
+{% else %}
+    <title>Notifikasi</title>
+{% endif %}
+
+{% block content %}
+<div class="row">
+    <div class="col">
+    <div class="card text-center">
+        <div class="card-header">
+            &nbsp;
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">{{ step }} Telah Tersimpan</h5>
+            <p class="card-text">Silahkan lanjut mengisi tahap berikutnya atau edit kembali data tahap sebelumnya.</p>
+            <div class="btn-group" role="group" hx-target="#hx_content" hx-swap="innerHTML">
+                <button type="button" class="btn btn-warning" hx-get="{{ prev_url }}">Edit Kembali</button>
+                <button type="button" class="btn btn-success" hx-get="{{ next_url }}">Lanjutkan</button>
+            </div>
+        </div>
+        <div class="card-footer text-body-secondary">
+            &nbsp;
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

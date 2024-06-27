@@ -60,8 +60,14 @@ def isi_data():
     try: 
         db.session.add(rgd)
         db.session.commit()
-        success = "Data berhasil disimpan"
-        return render_template('registrant/beranda.jinja', username=session['username'], success=success, is_htmx=htmx)
+        return render_template(
+            'registrant/notif.jinja', 
+            username=session['username'],
+            step="Data Pendaftar",
+            next_url=url_for('registrant.isi_wali'),
+            prev_url=url_for('registrant.isi_data'),
+            is_htmx=htmx
+        )
     except IntegrityError:
         error="Penyimpanan data gagal, ada data yang salah. Silahkan coba lagi"
         return render_template('registrant/isi_data.jinja', username=session['username'], error=error, is_htmx=htmx)

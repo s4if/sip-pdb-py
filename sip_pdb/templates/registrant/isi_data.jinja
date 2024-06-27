@@ -1,8 +1,8 @@
 {% if not is_htmx %}
     {% extends "registrant/layout.jinja" %}
-    {% block title %}Isi Data{% endblock %}
+    {% block title %}Isi Data Pendaftar{% endblock %}
 {% else %}
-    <title>Isi Data</title>
+    <title>Isi Data Pendaftar</title>
 {% endif %}
 
 {% from 'macros.jinja' import render_field, render_select %}
@@ -11,11 +11,11 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb" hx-target="#hx_content" hx-swap="innerHTML" >
         <li class="breadcrumb-item"><a href="{{ url_for('registrant.beranda') }}">Beranda</a></li>
-        <li class="breadcrumb-item active">Isi Data</li>
+        <li class="breadcrumb-item active">Data Pendaftar</li>
     </ol>
 </nav>
-<h1 class="h2">Isi Data Siswa</h1>
-<p>Isi Data Siswa Disini!</p>
+<h1 class="h2">Isi Data Pendaftar</h1>
+<p>Isi Data Pendaftar Disini!</p>
 
 <div class="row">
 	<div class="col-12">
