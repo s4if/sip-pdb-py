@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import  RadioField, SelectField, StringField, PasswordField, IntegerField, DateField
+from wtforms import  RadioField, SelectField, StringField, PasswordField, IntegerField, DateField, HiddenField
 from wtforms.validators import DataRequired, EqualTo, InputRequired, Length, ValidationError
 import phonenumbers
 
@@ -94,3 +94,60 @@ class RegistrantDataForm(FlaskForm):
     #achievements = StringField('Prestasi')
     #hospital_sheets = StringField('Riwayat Kesehatan')
     #physical_abnormalities = StringField('Kelainan Jasmani')
+    
+class ParentForm(FlaskForm):
+    type = HiddenField('Type', validators=[DataRequired()])
+    name = StringField('Nama', validators=[DataRequired(), Length(max=60)])
+    nik = StringField('NIK', validators=[DataRequired(), Length(min=16, max=16)])
+    status = SelectField('Status', choices=[
+        ('Hidup', 'Hidup'), 
+        ('Cerai', 'Cerai'), 
+        ('Almarhum', 'Almarhum')
+    ], validators=[DataRequired()])
+    birth_place = StringField('Tempat Lahir', validators=[DataRequired()])
+    birth_date = DateField('Tgl. Lahir', validators=[DataRequired()])
+    contact = StringField('Nomor Telepon', validators=[DataRequired(),validate_phone, Length(min=10, max=16)])
+    relation = SelectField('Hubungan Keluarga', choices=[
+        ('Kandung', 'Kandung'), 
+        ('Tiri', 'Tiri'), 
+        ('Angkat', 'Angkat')
+    ], validators=[DataRequired()])
+    nationality = SelectField('Kewarganegaraan', choices=[
+        ('WNI', 'WNI'), 
+        ('WNA', 'WNA')
+    ], validators=[DataRequired()])
+    religion = SelectField('Agama', choices=[
+        ('Islam', 'Islam'),
+        ('Kristen', 'Kriten'),
+        ('Katolik', 'Katolik'),
+        ('Hindu', 'Hindu'),
+        ('Budha', 'Budha'),
+        ('Konghucu', 'Konghucu'),
+        ('Penganut Kepercayaan', 'Penganut Kepercayaan')
+    ], validators=[DataRequired()])
+    education_level = SelectField('Tingkat Pendidikan', choices=[
+        ('Tidak Sekolah', 'Tidak Sekolah'),
+        ('SD', 'SD'),
+        ('SMP', 'SMP'),
+        ('SMA', 'SMA'),
+        ('D1', 'D1'),
+        ('D2', 'D2'),
+        ('D3', 'D3'),
+        ('S1', 'S1'),
+        ('S2', 'S2'),
+        ('S3', 'S3')
+    ], validators=[DataRequired()])
+    job = StringField('Pekerjaan', validators=[DataRequired()])
+    position = StringField('Jabatan')
+    company = StringField('Instansi')
+    income = IntegerField('Penghasilan')
+    burden_count = IntegerField('Jumlah Tanggungan')
+    street = StringField('Dusun', validators=[DataRequired()])
+    rt = IntegerField('RT')
+    rw = IntegerField('RW')
+    village = StringField('Kelurahan', validators=[DataRequired()])
+    district = StringField('Kecamatan', validators=[DataRequired()])
+    city = StringField('Kota', validators=[DataRequired()])
+    province = StringField('Provinsi', validators=[DataRequired()])
+    country = StringField('Negara', validators=[DataRequired()])
+    postal_code = IntegerField('Kode Pos', validators=[DataRequired()])

@@ -1,0 +1,18 @@
+{% from 'macros.jinja' import render_field %}
+
+{{ render_field(form.street) }}
+{{ render_field(form.rt) }}
+{{ render_field(form.rw) }}
+{{ render_field(form.village) }}
+{{ render_field(form.district) }}
+{{ render_field(form.city) }}
+{{ render_field(form.province) }}
+{{ render_field(form.country) }}
+{{ render_field(form.postal_code) }}
+<button type="button" 
+    class="btn btn-secondary"
+    hx-get="{{ url_for('registrant.clone_alamat') }}" 
+    hx-push-url="false"
+    hx-target="#alamat"
+    hx-swap="innerHTML"
+>Salin Alamat Pendaftar</button>

@@ -105,11 +105,11 @@ class Parent(db.Model):
     nationality = db.Column(db.String, nullable=False)
     religion = db.Column(db.String, nullable=False)  # pake radio
     education_level = db.Column(db.String, nullable=False)  # tingkat pendidikan, sd, smp.. s3
-    job = db.Column(db.String)
+    job = db.Column(db.String, nullable=False)
     position = db.Column(db.String)
     company = db.Column(db.String)
-    income = db.Column(db.BigInteger)
-    burden_count = db.Column(db.Integer)
+    income = db.Column(db.BigInteger, nullable=False, default=0)
+    burden_count = db.Column(db.Integer, nullable=False, default=0)
     
     def __repr__(self):
         return '<User {}>'.format(self.name)
