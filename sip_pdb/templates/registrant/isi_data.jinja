@@ -9,7 +9,7 @@
 
 {% block content %}
 <nav aria-label="breadcrumb">
-    <ol class="breadcrumb" hx-target="#hx_content" hx-swap="innerHTML" >
+    <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('registrant.beranda') }}">Beranda</a></li>
         <li class="breadcrumb-item active">Data Pendaftar</li>
     </ol>
@@ -19,7 +19,7 @@
 
 <div class="row">
 	<div class="col-12">
-		<form method="POST" action="{{ url_for('registrant.isi_data')}}" hx-boost="false">
+		<form method="POST" action="{{ url_for('registrant.isi_data')}}">
 		{{ form.csrf_token }}
         {{ render_field(form.nik) }}
         {{ render_field(form.nkk) }}

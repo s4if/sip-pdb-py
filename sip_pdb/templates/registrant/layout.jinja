@@ -146,7 +146,7 @@
                 </div>
               </div>
               {% endif %}
-              <div class="row">
+              <div class="row" hx-target="#hx_content" hx-swap="innerHTML">
                 <div class="col" id="hx_content">
                 {% block content %} {% endblock %}
                 </div>
