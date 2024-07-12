@@ -18,8 +18,9 @@ def beranda():
 @login_required
 def isi_data():
     from .forms import RegistrantDataForm
-    from .models import RegistrantData
+    from .models import RegistrantData, Registrant
     rgd = RegistrantData.query.filter_by(id=session['user_id']).first()
+    rg = Registrant.query.filter_by(id=session['user_id']).first()
     if request.method == 'GET':
         form = RegistrantDataForm(obj=rgd) if rgd else RegistrantDataForm()
         return render_template('registrant/isi_data.jinja', username=session['username'], form=form, is_htmx=htmx)
@@ -61,11 +62,14 @@ def isi_data():
     try: 
         db.session.add(rgd)
         db.session.commit()
+        rg.registrant_data_id = rgd.id
+        db.session.add(rg)
+        db.session.commit()
         return render_template(
             'registrant/notif.jinja', 
             username=session['username'],
             step="Data Pendaftar",
-            next_url=url_for('registrant.isi_wali'), #nanti diganti
+            next_url=url_for('registrant.isi_ortu', tipe='ayah'),
             prev_url=url_for('registrant.isi_data'),
             is_htmx=htmx
         )
@@ -164,6 +168,7 @@ def isi_ortu(tipe):
     parent.status = request.form['status']
     parent.birth_place = request.form['birth_place']
     parent.birth_date = datetime.datetime.strptime(request.form['birth_date'], '%Y-%m-%d')
+    parent.contact = request.form['contact']
     parent.relation = request.form['relation']
     parent.nationality = request.form['nationality']
     parent.religion = request.form['religion']
@@ -184,38 +189,56 @@ def isi_ortu(tipe):
     parent.postal_code = request.form['postal_code']
     
     rg = Registrant.query.filter_by(id=session['user_id']).first()
-    if tipe == 'ayah':
-        rg.ayah = parent
-    elif tipe == 'ibu':
-        rg.ibu = parent
-    elif tipe == 'wali':
-        rg.wali = parent
-    
+        
     # commit ke database
-    #try: 
-    db.session.add(parent)
-    db.session.commit()
-    db.session.add(rg)
-    db.session.commit()
-    success="Data tersimpan"
-    return render_template(
-        'registrant/isi_ortu.jinja', 
-        username=session['username'], 
-        form=form, success=success, 
-        tipe=tipe, 
-        is_htmx=htmx
+    try: 
+        next_url = prev_url = opt_url = opt_url_text = step = None
+        db.session.add(parent)
+        db.session.commit()
+        if tipe == 'ayah':
+            rg.ayah = parent.id
+            prev_url = url_for('registrant.isi_ortu', tipe='ayah')
+            next_url = url_for('registrant.isi_ortu', tipe='ibu')
+            step = "Data Ayah"
+            
+        elif tipe == 'ibu':
+            rg.ibu = parent.id
+            prev_url = url_for('registrant.isi_ortu', tipe='ibu')
+            next_url = url_for('registrant.isi_pernyataan')
+            step = "Data Ibu"
+            opt_url = url_for('registrant.isi_ortu', tipe='wali')
+            opt_url_text = "Isi Data Wali (Bila Perlu)"
+            
+        elif tipe == 'wali':
+            rg.wali = parent.id
+            prev_url = url_for('registrant.isi_ortu', tipe='wali')
+            next_url = url_for('registrant.isi_pernyataan')
+            step = "Data Wali"
+            
+        db.session.add(rg)
+        db.session.commit()
+        success="Data tersimpan"
+        return render_template(
+            'registrant/notif.jinja', 
+            username=session['username'],
+            step=step,
+            next_url=next_url,
+            prev_url=prev_url,
+            opt_url=opt_url,
+            opt_url_text=opt_url_text,
+            is_htmx=htmx
         )
         
-    #except IntegrityError:
-    #    error="error pada database. silahkan cek lagi data anda"
-    #    return render_template(
-    #        'registrant/isi_ortu.jinja', 
-    #        username=session['username'], 
-    #        form=form, 
-    #        error=error, 
-    #        tipe=tipe, 
-    #        is_htmx=htmx
-    #        )
+    except IntegrityError:
+        error="error pada database. silahkan kontak administrator"
+        return render_template(
+            'registrant/isi_ortu.jinja', 
+            username=session['username'], 
+            form=form, 
+            error=error, 
+            tipe=tipe, 
+            is_htmx=htmx
+            )
     
     
     

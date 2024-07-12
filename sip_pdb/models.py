@@ -37,10 +37,10 @@ class Registrant(db.Model):
     buy_laptop = db.Column(db.Boolean, nullable=False, default=True)
     qurban = db.Column(db.String(60), nullable=True)
     registrant_data_id = db.Column(db.Integer, db.ForeignKey('registrant_data.id'), nullable=True)
-    father_id = db.Column(db.Integer, db.ForeignKey('parents.id'), nullable=True)
-    mother_id = db.Column(db.Integer, db.ForeignKey('parents.id'), nullable=True)
-    guardian_id = db.Column(db.Integer, db.ForeignKey('parents.id'), nullable=True)
-    registrant_data = relationship('RegistrantData', foreign_keys=[registrant_data_id], cascade='all, delete', lazy='select')
+    father_id = db.Column(db.String(8), db.ForeignKey('parents.id'), nullable=True)
+    mother_id = db.Column(db.String(8), db.ForeignKey('parents.id'), nullable=True)
+    guardian_id = db.Column(db.String(8), db.ForeignKey('parents.id'), nullable=True)
+    registrant_data = relationship('RegistrantData', foreign_keys=[registrant_data_id], cascade='all, delete', lazy='joined')
     father = relationship('Parent', foreign_keys=[father_id], cascade='all, delete', lazy='select')
     mother = relationship('Parent', foreign_keys=[mother_id], cascade='all, delete', lazy='select')
     guardian = relationship('Parent', foreign_keys=[guardian_id], cascade='all, delete', lazy='select')
@@ -100,7 +100,7 @@ class Parent(db.Model):
     province = db.Column(db.String, nullable=False)
     country = db.Column(db.String)
     postal_code = db.Column(db.Integer, nullable=False)
-    contact = db.Column(db.String(18))  # Nomor Telepon
+    contact = db.Column(db.String(18), nullable=False)  # Nomor Telepon
     relation = db.Column(db.String, nullable=False)  # Kandung, Tiri, Angkat
     nationality = db.Column(db.String, nullable=False)
     religion = db.Column(db.String, nullable=False)  # pake radio

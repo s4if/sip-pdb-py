@@ -110,7 +110,9 @@ class ParentForm(FlaskForm):
     relation = SelectField('Hubungan Keluarga', choices=[
         ('Kandung', 'Kandung'), 
         ('Tiri', 'Tiri'), 
-        ('Angkat', 'Angkat')
+        ('Angkat', 'Angkat'),
+        ('Wali dari Kerabat', 'Wali dari Kerabat'),
+        ('Wali bukan Kerabat', 'Wali bukan Kerabat'),
     ], validators=[DataRequired()])
     nationality = SelectField('Kewarganegaraan', choices=[
         ('WNI', 'WNI'), 

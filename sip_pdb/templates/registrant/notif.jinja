@@ -23,6 +23,9 @@
             <div class="btn-group" role="group" hx-target="#hx_content" hx-swap="innerHTML">
                 <button type="button" class="btn btn-warning" hx-get="{{ prev_url }}">Edit Kembali</button>
                 <button type="button" class="btn btn-success" hx-get="{{ next_url }}">Lanjutkan</button>
+                {% if opt_url %}
+                <button type="button" class="btn btn-secondary" hx-get="{{ opt_url }}">{{ opt_url_text }}</button>
+                {% endif %}
             </div>
         </div>
         <div class="card-footer text-body-secondary">
