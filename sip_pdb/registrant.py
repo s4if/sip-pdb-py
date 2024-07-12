@@ -8,42 +8,6 @@ from .helper import htmx, login_required
 
 bp = Blueprint('registrant', __name__, url_prefix='/pendaftar')
 
-def render_ortu(tipe, parent):
-    from .forms import ParentForm
-    form = ParentForm()
-    form.type.data = tipe
-    form.name.data = parent.name
-    form.nik.data = parent.nik
-    form.status.data = parent.status
-    form.birth_place.data = parent.birth_place
-    form.birth_date.data = parent.birth_date
-    form.contact.data = parent.contact
-    form.relation.data = parent.relation
-    form.nationality.data = parent.nationality
-    form.religion.data = parent.religion
-    form.education_level.data = parent.education_level
-    form.job.data = parent.job
-    form.position.data = parent.position
-    form.company.data = parent.company
-    form.income.data = parent.income
-    form.burden_count.data = parent.burden_count
-    form.street.data = parent.street
-    form.rt.data = parent.rt
-    form.rw.data = parent.rw
-    form.village.data = parent.village
-    form.district.data = parent.district
-    form.city.data = parent.city
-    form.province.data = parent.province
-    form.country.data = parent.country
-    form.postal_code.data = parent.postal_code
-    return render_template(
-        'registrant/isi_ortu.jinja', 
-        username=session['username'], 
-        form=form,
-        form_url=url_for('registrant.isi_ortu', tipe=tipe),
-        tipe=tipe, 
-        is_htmx=htmx
-    )
 
 @bp.route('/')
 @login_required
@@ -135,19 +99,64 @@ def isi_ortu(tipe):
         error="Mohon maaf, url tidak ditemukan."
         return render_template('registrant/beranda.jinja', error=error, is_htmx=htmx)
     
-    from .models import Parent
+    from .models import Parent, Registrant
+    from .forms import ParentForm
     parent = Parent.query.filter_by(id=f"{session['user_id']}"+"_"+tipe).first()
+    form = ParentForm(obj = parent) if parent else ParentForm()
     if not parent:
         parent = Parent()
         parent.id = f"{session['user_id']}"+"_"+tipe
         
+    form.type.data = tipe
+    form.name.data = parent.name
+    form.nik.data = parent.nik
+    form.status.data = parent.status
+    form.birth_place.data = parent.birth_place
+    form.birth_date.data = parent.birth_date
+    form.contact.data = parent.contact
+    form.relation.data = parent.relation
+    form.nationality.data = parent.nationality
+    form.religion.data = parent.religion
+    form.education_level.data = parent.education_level
+    form.job.data = parent.job
+    form.position.data = parent.position
+    form.company.data = parent.company
+    form.income.data = parent.income
+    form.burden_count.data = parent.burden_count
+    form.street.data = parent.street
+    form.rt.data = parent.rt
+    form.rw.data = parent.rw
+    form.village.data = parent.village
+    form.district.data = parent.district
+    form.city.data = parent.city
+    form.province.data = parent.province
+    form.country.data = parent.country
+    form.postal_code.data = parent.postal_code
+            
     if request.method == 'GET':
-        return render_ortu(tipe, parent)
+        return render_template(
+            'registrant/isi_ortu.jinja', 
+            username=session['username'], 
+            form=form,
+            form_url=url_for('registrant.isi_ortu', tipe=tipe),
+            tipe=tipe, 
+            is_htmx=htmx,
+        )
     
-    from .forms import ParentForm
+    
     form = ParentForm(request.form)
+    form.type.data = tipe
     if not form.validate():
-        return render_ortu(tipe, parent, form)
+        print(form.errors)
+        return render_template(
+            'registrant/isi_ortu.jinja', 
+            username=session['username'], 
+            form=form,
+            form_url=url_for('registrant.isi_ortu', tipe=tipe),
+            tipe=tipe, 
+            is_htmx=htmx,
+            error="Penyimpanan data gagal. Silahkan cek lagi data anda"
+        )
     
     parent.type = tipe
     parent.name = request.form['name']
@@ -174,14 +183,39 @@ def isi_ortu(tipe):
     parent.country = request.form['country']
     parent.postal_code = request.form['postal_code']
     
+    rg = Registrant.query.filter_by(id=session['user_id']).first()
+    if tipe == 'ayah':
+        rg.ayah = parent
+    elif tipe == 'ibu':
+        rg.ibu = parent
+    elif tipe == 'wali':
+        rg.wali = parent
+    
     # commit ke database
-    try: 
-        db.session.add(parent)
-        db.session.commit()
-        return render_ortu(tipe, parent, form)
-    except IntegrityError:
-        error="Penyimpanan data gagal, ada data yang salah. Silahkan coba lagi"
-        return render_ortu(tipe, parent, form, error)
+    #try: 
+    db.session.add(parent)
+    db.session.commit()
+    db.session.add(rg)
+    db.session.commit()
+    success="Data tersimpan"
+    return render_template(
+        'registrant/isi_ortu.jinja', 
+        username=session['username'], 
+        form=form, success=success, 
+        tipe=tipe, 
+        is_htmx=htmx
+        )
+        
+    #except IntegrityError:
+    #    error="error pada database. silahkan cek lagi data anda"
+    #    return render_template(
+    #        'registrant/isi_ortu.jinja', 
+    #        username=session['username'], 
+    #        form=form, 
+    #        error=error, 
+    #        tipe=tipe, 
+    #        is_htmx=htmx
+    #        )
     
     
     

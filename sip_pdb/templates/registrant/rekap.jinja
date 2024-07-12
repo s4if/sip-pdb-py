@@ -5,7 +5,12 @@
     <title>Rekap</title>
 {% endif %}
 
+{% from 'macros.jinja' import render_notif %}
+
 {% block content %}
+
+{{ render_notif(error, success, info) }}
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb" >
         <li class="breadcrumb-item"><a href="{{ url_for('registrant.beranda') }}">Beranda</a></li>

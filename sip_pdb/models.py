@@ -84,7 +84,7 @@ class RegistrantData(db.Model):
     
 class Parent(db.Model):
     __tablename__ = 'parents'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.String(8), primary_key=True)
     type = db.Column(db.String(4), nullable=False) # tipe, Ayah, Ibu, Wali
     name = db.Column(db.String(60), nullable=False)
     nik = db.Column(db.String(16), nullable=False)

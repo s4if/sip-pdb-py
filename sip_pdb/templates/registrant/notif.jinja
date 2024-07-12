@@ -5,7 +5,12 @@
     <title>Notifikasi</title>
 {% endif %}
 
+{% from 'macros.jinja' import render_notif %}
+
 {% block content %}
+
+{{ render_notif(error, success, info) }}
+
 <div class="row">
     <div class="col">
     <div class="card text-center">

@@ -116,36 +116,6 @@
                 </div>
             </nav>
             <main class="col-xl-10 col-lg-9 col-md-9 col-12 fix-padding">
-              {% if error %}
-              <div class="row">
-                <div class="col">
-                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                      {{ error }}
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                </div>
-              </div>
-              {% endif %}
-              {% if success %}
-              <div class="row">
-                <div class="col">
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                      {{ success }}
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                </div>
-              </div>
-              {% endif %}
-              {% if info %}
-              <div class="row">
-                <div class="col">
-                    <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                      {{ info }}
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                </div>
-              </div>
-              {% endif %}
               <div class="row" hx-target="#hx_content" hx-swap="innerHTML">
                 <div class="col" id="hx_content">
                 {% block content %} {% endblock %}
