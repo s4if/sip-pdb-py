@@ -32,7 +32,7 @@ class Registrant(db.Model):
     gelombang = db.Column(db.Integer, nullable=False)
     registration_time = db.Column(db.DateTime, nullable=False)
     initial_cost = db.Column(db.BigInteger, nullable=True)
-    subscription_cost = db.Column(db.BigInteger, nullable=True)
+    monthly_cost = db.Column(db.BigInteger, nullable=True)
     land_donation = db.Column(db.BigInteger, nullable=True)
     buy_laptop = db.Column(db.Boolean, nullable=False, default=True)
     qurban = db.Column(db.String(60), nullable=True)
@@ -74,10 +74,10 @@ class RegistrantData(db.Model):
     weight = db.Column(db.Integer, nullable=False)
     head_size = db.Column(db.Integer, nullable=False)
     stay_with = db.Column(db.String, nullable=False)  # tinggal dengan siapa
-    hobbies = db.Column(db.JSON, nullable=False, default={})
-    achievements = db.Column(db.JSON, nullable=False, default={})
-    hospital_sheets = db.Column(db.JSON, nullable=False, default={})
-    physical_abnormalities = db.Column(db.JSON, nullable=False, default={})
+    hobbies = db.Column(db.String(1024), nullable=True)
+    achievements = db.Column(db.String(1024), nullable=True)
+    hospital_sheets = db.Column(db.String(1024), nullable=True)
+    physical_abnormalities = db.Column(db.String(1024), nullable=True)
     
     def __repr__(self):
         return '<User {}>'.format(self.name)
