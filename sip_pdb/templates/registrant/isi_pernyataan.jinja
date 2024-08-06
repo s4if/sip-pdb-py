@@ -5,7 +5,7 @@
     <title>Isi Pernyataan</title>
 {% endif %}
 
-{% from 'macros.jinja' import render_field, render_notif %}
+{% from 'macros.jinja' import render_field, render_notif, format_idr %}
 
 {% block content %}
 
@@ -18,11 +18,248 @@
     </ol>
 </nav>
 <h1 class="h2">Isi Pernyataan</h1>
-<!-- TODO: tampilan data awal + tombol upload foto dan scan dokumen -->
-<p>Isi Data Siswa Disini!</p>
 <div class="row">
-    <div class="col">
-        <p>Lorem Ipsum</p>
-    </div>
+    <p>
+        Pada langkah ini, Anda akan membuat surat pernyataan mengenai Jumlah Uang Infaq pendidikan, IDP, dll. 
+        Pastikan yang mengisi formulir ini adalah 
+        <strong>Orang Tua</strong> atau Anda <strong>Telah berdiskusi</strong> dengan orang tua Anda. <br/>
+    </p>
 </div>
+<div class="row">
+<div class="col">
+<div class="card">
+  <div class="card-header">
+    Teks Pernyataan
+  </div>
+  <div class="card-body">
+  <div class="card-text">
+  <p>Dengan ini menyatakan bahwa:</p>
+    <ol>
+        <li class="pernyataan">
+            Jika anak saya diterima sebagai siswa SMKIT Ihsanul Fikri Mungkid, saya menyerahkan anak saya dan siap bekerja sama 
+            dalam hal pembinaan diri selama berstatus sebagai siswa SMKIT Ihsanul Fikri Mungkid, bersedia menerima segala konsekuensi
+            akibat peraturan yang berlaku di dalamnya, dan tidak menuntut apapun yang menjadi keputusan sekolah.
+        </li>
+        <li class="pernyataan">
+            Jika anak saya diterima sebagai siswa SMKIT Ihsanul Fikri Mungkid, saya akan melunasi  
+            pembiayaan sesuai dengan kesanggupan saya:
+        </li>
+        
+        <style type="text/css">
+            .pembiayaan table,th,tr,td {
+                border-collapse: collapse;
+                border: 1px solid black;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        </style>
+        <div class="pembiayaan">
+        <table>
+  <thead>
+    <tr>
+      <th>Jenis Pembiayaan</th>
+      <th>Nominal Pembiayaan</th>
+      <th>Frekuensi Pembiayaan</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>a. Infaq Pendidikan</td>
+      <td> [ Sesuai Pilihan ] </td>
+      <td>Sekali</td>
+    </tr>
+    <tr>
+      <td>b. Iuran Dana Pendidikan (IDP) bulanan</td>
+      <td> [ Sesuai Pilihan ] </td>
+      <td>Per Bulan</td>
+    </tr>
+    <tr>
+      <td>c. Wakaf Tanah</td>
+      <td> [ Sesuai Pilihan ] </td>
+      <td>Sekali</td>
+    </tr>
+    <tr>
+      <td>d. Seragam</td>
+      <td>{{ format_idr(seragam) }}</td>
+      <td>Sekali</td>
+    </tr>
+    <tr>
+      <td>e. Dana Kegiatan</td>
+      <td>{{ format_idr(dana_kegiatan) }}</td>
+      <td>Per Tahun</td>
+    </tr>
+    <tr>
+      <td>f. Dana Kesehatan</td>
+      <td> {{ format_idr(dana_kesehatan) }}</td>
+      <td>Per Tahun</td>
+    </tr>
+    <tr>
+      <td>g. Biaya Buku</td>
+      <td> {{ format_idr(dana_buku) }}</td>
+      <td>Per Tahun</td>
+    </tr>
+    <tr>
+      <td>h. Dana Praktik</td>
+      <td> {{ format_idr(dana_praktik) }}</td>
+      <td>Per Tahun</td>
+    </tr>
+    <tr>
+      <td>i. Majalan dan Kalender</td>
+      <td> {{ format_idr(majalah_kalender) }}</td>
+      <td>Per Tahun</td>
+    </tr>
+    <tr>
+      <th><strong>Total</strong></th>
+      <th>{{ format_idr(total) }}</th>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+        <li class="pernyataan">
+            Bersedia mengikuti program Qurban minimal 1 kali selama menjadi siswa SMKIT Ihsanul 
+            Fikri Mungkid pada Hari Raya Idul Adha tahun <?php 
+            $tampil_tahun = $tahun_masuk+1;
+            echo $tampil_tahun . '/' . ++$tampil_tahun . '/' . ++$tampil_tahun;?> (Tahun dapat dipilih).
+        </li>
+        <li class="pernyataan">
+            Apabila setelah pendaftaran ulang ternyata anak saya mengundurkan diri, maka saya 
+            tidak akan menuntut segala yang telah saya bayarkan sebelumnya. Seluruh pembiayaan 
+            yang saya bayarkan tidak akan saya tarik kembali dan dijadikan sebagai Infaq.
+        </li>
+    </ol>
+  </div>
+  </div>
+</div>
+</div>
+</div>
+<div class="row">
+<div class="col">
+&nbsp;
+</div>
+</div>
+<div class="row">
+<div class="col">
+<div class="card card-primary">
+  <div class="card-header">
+    Input Pernyataan
+  </div>
+  <div class="card-body">
+<form method="post" action="{{ url_for('registrant.isi_pernyataan') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <div class="col-md-12">
+        <label for="raw_icost" class="form-label">Infaq Pendidikan :</label>
+        {% for ip in range(bpm.infaq_pendidikan, bpm.infaq_pendidikan+2000001, 1000000) %}
+        <div class="form-check" onclick="icost_input()">
+            <input class="form-check-input" type="radio" name="raw_icost" {% if ip == fv.infaq_pendidikan %} checked {% endif %} value="{{ ip }}">
+            <label class="form-check-label">{{ format_idr(ip) }}</label>
+        </div>
+        {% endfor %}
+        <div class="form-check" onclick="icost_input()">
+            <input class="form-check-input" type="radio" {% if fv.icost > bpm.infaq_pendidikan + 2000001 %} checked {% endif %}
+             name="raw_icost" id="icost_other" value="-999">
+            <label class="form-check-label">Lebih dari {{ format_idr(bpm.infaq_pendidikan + 2000000) }}</label>
+        </div>
+    </div>
+    <div class="col-md-12 {% if fv.icost < bpm.infaq_pendidikan + 2000001 %} d-none {% endif %}" id="icost_panel">
+        <label for="other_icost" class="form-label">Jumlah Melebih {{ format_idr(bpm.infaq_pendidikan + 2000000) }} Tanpa Titik</label>
+        <input type="number" class="form-control" id="other_icost" name="other_icost"
+           {% if fv.icost > bpm.infaq_pendidikan + 2000000 %} value="{{fv.icost}}" {% endif %} >
+    </div>
+    <!-- Separator -->
+    <div class="col-md-12">
+        <label for="raw_scost" class="form-label">Iuran Dana Pendidikan :</label>
+        {% for spp in range(bpm.spp, bpm.spp+1000001, 500000) %}
+        <div class="form-check" onclick="scost_input()">
+            <input class="form-check-input" type="radio" name="raw_scost" {% if spp == fv.spp %} checked {% endif %} value="{{ spp }}">
+            <label class="form-check-label">{{ format_idr(spp) }}</label>
+        </div>
+        {% endfor %}
+        <div class="form-check" onclick="scost_input()">
+            <input class="form-check-input" type="radio" {% if fv.scost > bpm.spp + 1000001 %} checked {% endif %}
+             name="raw_scost" id="scost_other" value="-999">
+            <label class="form-check-label">Lebih dari {{ format_idr(bpm.spp + 1000000) }}</label>
+        </div>
+    </div>
+    <div class="col-md-12 {% if fv.scost < bpm.spp + 1000001 %} d-none {% endif %}" id="scost_panel">
+        <label for="other_scost" class="form-label">Jumlah Melebih {{ format_idr(bpm.spp + 1000000) }} Tanpa Titik</label>
+        <input type="number" class="form-control" id="other_scost" name="other_scost"
+           {% if fv.scost > bpm.spp + 1000000 %} value="{{fv.scost}}" {% endif %} >
+    </div>
+    <!-- Separator -->
+    <div class="col-md-12">
+        <label for="raw_scost" class="form-label">Wakaf Tanah :</label>
+        {% for wt in range(bpm.wakaf_tanah, bpm.wakaf_tanah+1000001, 500000) %}
+        <div class="form-check" onclick="lcost_input()">
+            <input class="form-check-input" type="radio" name="raw_lcost" {% if wt == fv.spp %} checked {% endif %} value="{{ wt }}">
+            <label class="form-check-label">{{ format_idr(wt) }}</label>
+        </div>
+        {% endfor %}
+        <div class="form-check" onclick="lcost_input()">
+            <input class="form-check-input" type="radio" {% if fv.lcost > bpm.wakaf_tanah + 1000001 %} checked {% endif %}
+             name="raw_lcost" id="lcost_other" value="-999">
+            <label class="form-check-label">Lebih dari {{ format_idr(bpm.wakaf_tanah + 1000000) }}</label>
+        </div>
+    </div>
+    <div class="col-md-12 {% if fv.lcost < bpm.wakaf_tanah + 1000001 %} d-none {% endif %}" id="lcost_panel">
+        <label for="other_lcost" class="form-label">Jumlah Melebih {{ format_idr(bpm.wakaf_tanah + 1000000) }} Tanpa Titik</label>
+        <input type="number" class="form-control" id="other_lcost" name="other_lcost"
+           {% if fv.lcost > bpm.wakaf_tanah + 1000000 %} value="{{fv.lcost}}" {% endif %} >
+    </div>
+    <!-- Separator -->
+    <div class="col-md-12">
+        <label for="main_parent" class="form-label">Nama Yang Dicantumkan :</label>
+        <select class="form-select" id="main_parent" name="main_parent">
+        {% for p in [['father','Nama Ayah'], ['mother', 'Nama Ibu'], ['guardian', 'Nama Wali']] %}
+            <option value="{{ p[0] }}" {% if p[0] == fv.main_parent %} selected {% endif %}>{{ p[1] }}</option>
+        {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-12">
+        <label class="form-label">Bersedia mengikuti program Qurban minimal 1 kali selama menjadi siswa pada Hari Raya Idul Adha tahun</label>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="q1" name="q1" value="{{ tahun_masuk }}" 
+            {% if ( tahun_masuk | string ) in fv.qurban %} checked {% endif %}>
+            <label class="form-check-label" for="q1">{{ tahun_masuk }}</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="q2" name="q2" value="{{ tahun_masuk+1 }}" 
+            {% if ( (tahun_masuk+1) | string ) in fv.qurban %} checked {% endif %}>
+            <label class="form-check-label" for="q2">{{ tahun_masuk+1 }}</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="q3" name="q3" value="{{ tahun_masuk+2 }}" 
+            {% if ( (tahun_masuk+2) | string ) in fv.qurban %} checked {% endif %}>
+            <label class="form-check-label" for="q3">{{ tahun_masuk+2 }}</label>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <button type="submit" class="btn btn-primary">OK</button>
+        <a class="btn btn-warning" href="#">Cancel</a>
+    </div>
+</form>
+</div>
+</div>
+</div>
+</div>
+<script type="text/javascript">
+icost_input = () => {
+  var icost_panel = document.getElementById("icost_panel")
+  var icost_other = document.getElementById("icost_other")
+  if (icost_other.checked) icost_panel.classList.remove("d-none")
+  else icost_panel.classList.add("d-none")
+}
+scost_input = () => {
+  var scost_panel = document.getElementById("scost_panel")
+  var scost_other = document.getElementById("scost_other")
+  if (scost_other.checked) scost_panel.classList.remove("d-none")
+  else scost_panel.classList.add("d-none")
+}
+lcost_input = () => {
+  var lcost_panel = document.getElementById("lcost_panel")
+  var lcost_other = document.getElementById("lcost_other")
+  if (lcost_other.checked) lcost_panel.classList.remove("d-none")
+  else lcost_panel.classList.add("d-none")
+}
+</script>
 {% endblock %}

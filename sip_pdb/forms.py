@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import  RadioField, SelectField, StringField, PasswordField, IntegerField, DateField, HiddenField
+from wtforms import  RadioField, SelectField, StringField, PasswordField, IntegerField, DateField, HiddenField, BooleanField
 from wtforms.validators import DataRequired, EqualTo, InputRequired, Length, ValidationError
 import phonenumbers
 
@@ -153,3 +153,10 @@ class ParentForm(FlaskForm):
     province = StringField('Provinsi', validators=[DataRequired()])
     country = StringField('Negara', validators=[DataRequired()])
     postal_code = IntegerField('Kode Pos', validators=[DataRequired()])
+    
+class LetterForm(FlaskForm):
+    initial_cost = IntegerField('Biaya Awal', validators=[DataRequired()])
+    monthly_cost = IntegerField('Biaya Bulanan', validators=[DataRequired()])
+    land_donation = IntegerField('Donasi Lahan', validators=[DataRequired()])
+    qurban = StringField('Qurban', validators=[DataRequired()])
+    buy_laptop = BooleanField('Beli Laptop')

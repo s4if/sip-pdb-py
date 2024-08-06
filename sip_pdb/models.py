@@ -35,6 +35,7 @@ class Registrant(db.Model):
     monthly_cost = db.Column(db.BigInteger, nullable=True)
     land_donation = db.Column(db.BigInteger, nullable=True)
     buy_laptop = db.Column(db.Boolean, nullable=False, default=True)
+    main_parent = db.Column(db.String(8), nullable=False, default='father') # nanti dijadikan not null, default = 'father'
     qurban = db.Column(db.String(60), nullable=True)
     registrant_data_id = db.Column(db.Integer, db.ForeignKey('registrant_data.id'), nullable=True)
     father_id = db.Column(db.String(8), db.ForeignKey('parents.id'), nullable=True)

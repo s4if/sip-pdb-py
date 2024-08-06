@@ -46,3 +46,12 @@
   </div>
   {% endif %}
 {% endmacro %}
+
+{% macro format_idr(value) %}
+    {# Check if the value is a number and format it accordingly #}
+    {% if value is number %}
+        Rp. {{ "{:,.0f}".format(value).replace(",", ".") }},-
+    {% else %}
+        {{ value }}
+    {% endif %}
+{% endmacro %}

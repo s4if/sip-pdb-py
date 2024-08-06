@@ -196,13 +196,13 @@ def isi_ortu(tipe):
         db.session.add(parent)
         db.session.commit()
         if tipe == 'ayah':
-            rg.ayah = parent.id
+            rg.ayah = parent
             prev_url = url_for('registrant.isi_ortu', tipe='ayah')
             next_url = url_for('registrant.isi_ortu', tipe='ibu')
             step = "Data Ayah"
             
         elif tipe == 'ibu':
-            rg.ibu = parent.id
+            rg.ibu = parent
             prev_url = url_for('registrant.isi_ortu', tipe='ibu')
             next_url = url_for('registrant.isi_pernyataan')
             step = "Data Ibu"
@@ -210,14 +210,13 @@ def isi_ortu(tipe):
             opt_url_text = "Isi Data Wali (Bila Perlu)"
             
         elif tipe == 'wali':
-            rg.wali = parent.id
+            rg.wali = parent
             prev_url = url_for('registrant.isi_ortu', tipe='wali')
             next_url = url_for('registrant.isi_pernyataan')
             step = "Data Wali"
             
         db.session.add(rg)
         db.session.commit()
-        success="Data tersimpan"
         return render_template(
             'registrant/notif.jinja', 
             username=session['username'],
@@ -249,10 +248,94 @@ def isi_ortu(tipe):
 def isi_wali():
     return render_template('registrant/isi_wali.jinja', username=session['username'], is_htmx=htmx)
 
-@bp.route('/isi_pernyataan')
+@bp.route('/isi_pernyataan', methods=('GET', 'POST'))
 @login_required
 def isi_pernyataan():
-    return render_template('registrant/isi_pernyataan.jinja', username=session['username'], is_htmx=htmx)
+    error = None
+    from .config import PDB_CONFIG
+    from .models import Registrant
+    biaya_tetap = PDB_CONFIG['biaya_tetap']
+    tahun_masuk = PDB_CONFIG['tahun_masuk']
+    bpm=PDB_CONFIG['biaya_pendidikan_minimal'] # bpm -> biaya pendidikan minimal
+    fv = { # fv -> Form Value
+        'icost' : 0,
+        'scost' : 0,
+        'lcost' : 0,
+        'main_parent' : 'father',
+        'qurban': ''
+    }
+    rg = Registrant.query.filter_by(id=session['user_id']).first()
+    if request.method == 'POST':
+        failure = []
+        fv['icost'] = request.form['raw_icost']
+        if request.form['raw_icost'] not in range(int(bpm['infaq_pendidikan']), int(bpm['infaq_pendidikan'])+2000001):
+            fv['icost'] = int(request.form['other_icost'])
+            if fv['icost'] < int(bpm['infaq_pendidikan']) + 2000000:
+                failure.append('Isian Khusus Infaq Pendidikan tidak boleh kurang dari Rp. ' +
+                               "{:,.0f}".format(int(bpm['infaq_pendidikan']) + 2000000).replace(",", ".") + ',-')
+                
+        fv['scost'] = request.form['raw_scost']
+        if request.form['raw_scost'] not in range(int(bpm['spp']), int(bpm['spp'])+1000001):
+            fv['scost'] = int(request.form['other_scost'])
+            if fv['scost'] < int(bpm['spp']) + 1000000:
+                failure.append('Isian Khusus SPP tidak boleh kurang dari Rp. ' +
+                               "{:,.0f}".format(int(bpm['spp']) + 1000000).replace(",", ".") + ',-')
+                
+        fv['lcost'] = request.form['raw_lcost']
+        if request.form['raw_lcost'] not in range(int(bpm['wakaf_tanah']), int(bpm['wakaf_tanah'])+1000001):
+            fv['lcost'] = int(request.form['other_lcost'])
+            if fv['lcost'] < int(bpm['wakaf_tanah']) + 1000000:
+                failure.append('Isian Khusus Wakaf Tanah tidak boleh kurang dari Rp. ' +
+                               "{:,.0f}".format(int(bpm['wakaf_tanah']) + 1000000).replace(",", ".") + ',-')
+                
+        fv['main_parent'] = request.form['main_parent']
+        if failure != []:
+            error = '<br>'.join(failure)
+        else : 
+            rg.initial_cost = fv['icost']
+            rg.monthly_cost = fv['scost']
+            rg.land_donation = fv['lcost']
+            rg.main_parent = fv['main_parent']
+            qurban=[]
+            if 'q1' in request.form:
+                qurban.append(str(tahun_masuk))
+            if 'q2' in request.form:
+                qurban.append(str(tahun_masuk+1))
+            if 'q3' in request.form:
+                qurban.append(str(tahun_masuk+2))
+            rg.qurban = ';'.join(qurban) if qurban != [] else ''
+            db.session.add(rg)
+            db.session.commit()
+            prev_url = url_for('registrant.isi_ortu', tipe='ibu')
+            next_url = url_for('registrant.rekap')
+            step = "Surat Pernyataan"
+        
+            return render_template(
+                'registrant/notif.jinja', 
+                username=session['username'],
+                step=step,
+                next_url=next_url,
+                prev_url=prev_url,
+                is_htmx=htmx
+            )
+    
+    fv['icost'] = rg.initial_cost if rg.initial_cost else 0
+    fv['scost'] = rg.monthly_cost if rg.monthly_cost else 0
+    fv['lcost'] = rg.land_donation if rg.land_donation else 0
+    fv['main_parent'] = rg.main_parent if rg.main_parent else 'father'
+    fv['qurban'] = rg.qurban if rg.qurban else ''
+
+    return render_template(
+        'registrant/isi_pernyataan.jinja', 
+        username=session['username'], 
+        is_htmx=htmx, 
+        bpm=bpm,
+        fv=fv,
+        error=error,
+        tahun_masuk=tahun_masuk,
+        **biaya_tetap
+        )
+    
 
 @bp.route('/rekap')
 @login_required
