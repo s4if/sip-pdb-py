@@ -1,6 +1,6 @@
 import datetime
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, abort, flash, g, redirect, render_template, request, send_file, session, url_for
 )
 from sqlalchemy.exc import IntegrityError
 from .db import db
@@ -19,16 +19,20 @@ def beranda():
 def isi_data():
     from .forms import RegistrantDataForm
     from .models import RegistrantData, Registrant
+    from .config import instancedir
+    import os
+    
     rgd = RegistrantData.query.filter_by(id=session['user_id']).first()
     rg = Registrant.query.filter_by(id=session['user_id']).first()
+    pu = os.path.isfile(os.path.join(instancedir, 'foto', f'{session["user_id"]}_foto.png'))
     if request.method == 'GET':
         form = RegistrantDataForm(obj=rgd) if rgd else RegistrantDataForm()
-        return render_template('registrant/isi_data.jinja', username=session['username'], form=form, is_htmx=htmx)
+        return render_template('registrant/isi_data.jinja', username=session['username'], form=form, photo_uploaded=pu, is_htmx=htmx)
     
     form = RegistrantDataForm(request.form)
     if not form.validate():
         error="Penyimpanan data gagal. Silahkan cek lagi data anda"
-        return render_template('registrant/isi_data.jinja', username=session['username'], form=form, error=error, is_htmx=htmx)
+        return render_template('registrant/isi_data.jinja', username=session['username'], form=form, error=error, photo_uploaded=pu, is_htmx=htmx)
         
     if not rgd:
         rgd = RegistrantData()
@@ -75,7 +79,7 @@ def isi_data():
         )
     except IntegrityError:
         error="Penyimpanan data gagal, ada data yang salah. Silahkan coba lagi"
-        return render_template('registrant/isi_data.jinja', username=session['username'], error=error, is_htmx=htmx)
+        return render_template('registrant/isi_data.jinja', username=session['username'], error=error, photo_uploaded=pu, is_htmx=htmx)
     
 @bp.route('/clone_alamat', methods=['GET'])
 @login_required
@@ -342,3 +346,43 @@ def isi_pernyataan():
 def rekap():
     return render_template('registrant/rekap.jinja', username=session['username'], is_htmx=htmx)
 
+@bp.route('/laman_upload')
+@login_required
+def laman_upload():
+    return render_template('registrant/laman_upload.jinja', username=session['username'], is_htmx=htmx)
+
+@bp.route('/proses_foto', methods=['POST'])
+@login_required
+def proses_foto():
+    from werkzeug.utils import secure_filename
+    from .config import instancedir
+    import os
+    from PIL import Image
+    
+    f = request.files['file']
+    filename = secure_filename(f.filename)
+    foto_dir = os.path.join(instancedir, 'foto')
+    if not os.path.isdir(foto_dir):
+        os.mkdir(foto_dir)
+    
+    allowed_exts = {'.jpg', '.jpeg', '.png'}
+    ext = os.path.splitext(filename)[1]
+    if ext.lower() not in allowed_exts:
+        return 'STATUS: Error. <br>File harus bertipe .jpg, .jpeg, atau .png', 415
+
+    img = Image.open(f)
+    img = img.resize((600, 800), Image.LANCZOS)
+    img.save(os.path.join(foto_dir, f'{session["user_id"]}_foto.png'))
+    url_foto = url_for('registrant.get_foto')
+    return f'STATUS: Foto Berhasil di Update. <a class="btn btn-info btn-sm" target="_blank" href="{url_foto}">Lihat Foto</a>', 200
+
+@bp.route('/get_foto')
+@login_required
+def get_foto():
+    from .config import instancedir
+    import os
+    
+    if os.path.isfile(os.path.join(instancedir, 'foto', f'{session["user_id"]}_foto.png')):
+        return send_file(os.path.join(instancedir, 'foto', f'{session["user_id"]}_foto.png'), mimetype='image/png')
+    else:
+        return 'Foto tidak ditemukan', 404

@@ -20,6 +20,48 @@
 <h1 class="h2">Isi Data Pendaftar</h1>
 <p>Isi Data Pendaftar Disini!</p>
 
+<div class="row justify-content-start">
+    <div class="col">
+        <div class="card">
+        <div class="card-header">
+            Unggah Foto
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"
+                            hx-target="#img_content"
+                            hx-swap="innerHTML"
+                            hx-push-url="false"
+                            >
+                    <form method="post" action="{{ url_for('registrant.proses_foto') }}"  
+                            class="row row-cols-lg-auto g-3 align-items-center"
+                            accept="image/*" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="col-12">
+                        <label class="form-label">Unggah foto resmi dengan proporsi 3x4</label>
+                    </div>
+                    <div class="col-12"><input class="form-control" type="file" id="file" name="file" required></div>
+                    <div class="col-12"><button type="submit" class="btn btn-primary">Submit</button></div>
+                </form>
+                </li>
+                <li class="list-group-item" id="img_content" hx-boost="false">
+                {% if photo_uploaded %}
+                STATUS: sudah upload. 
+                <a class="btn btn-info btn-sm" target="_blank" href="{{ url_for('registrant.get_foto') }}">Lihat Foto</a>
+                {% else %} STATUS: Belum Upload {% endif %}
+                </li>
+            </ul>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+<div class="col">
+<hr>
+</div>
+</div>
+
 <div class="row">
 	<div class="col-12">
 		<form method="POST" action="{{ url_for('registrant.isi_data')}}">
