@@ -20,8 +20,93 @@
 <p>Ini Beranda</p>
 
 <div class="row">
-    <div class="<col>">
-        <p>Lorem Ipsum</p>
+<div class="<col>">
+<div > <!-- jumbotron sudah gak ada? -->
+    {% if reg_fee < 0 %}
+    <h1>Mohon maaf</h1>
+    <p>
+        Mohon maaf, bukti pembayaran yang anda upload salah atau tidak bisa terbaca. 
+        Silahkan scan atau foto kembali kwitansi pembayaran anda dengan jelas lalu upload 
+        dengan klik tombol di bawah.
+    </p>
+    <a class="btn btn-warning" data-toggle="modal" data-target="#uploadKwitansi" id="btn-kwitansi" >
+        <span class="glyphicon glyphicon-upload"></span>
+        Upload Kwitansi
+    </a>
+    {% elif finalized %}
+    <h1>Selamat, anda telah menyelesaikan pendaftaran!</h1>
+    <p>
+        Terimakasih telah mendaftar di SMKIT Ihsanul Fikri.<br/>
+        <!-- Pendaftaran akan dilakukan dengan metode <em>Fast Service</em>, 
+        silahkan hubungi whatsapp <strong>+62 857-2962-9508</strong> untuk keterangan lebih lanjut.-->
+        Tes PPDB akan dilaksanakan pada tanggal 11 Februari 2024<br/>
+        Silahkan Unduh dan cetak formulir dan kartu pendaftaran.
+    </p>        
+    <a class="btn btn-primary" href="{{ url_for('print_data_pendaftaran', id=id) }}">
+        Unduh Kartu Dan Formulir Pendaftaran</a>
+    {% elif reg_fee == 0 %}
+    <h1>Selamat Datang di Sistem PPDB SMKIT Ihsanul Fikri Mungkid</h1>
+    <p>
+        Ini adalah sistem pendaftaran peserta didik baru (PPDB) SMKIT Ihsanul Fikri Mungkid.
+        Sebelum anda mengisi data pribadi, silahkan mentransfer telebih dahulu biaya pendaftaran peserta 
+        sebesar <strong>Rp. 200.000,-</strong> ditambah <strong>nomor unik (Contoh = 200.123)</strong> di 
+        Rekening <strong>Bank Syariah Indonesia (Kode: <embed>451</embed> Eks BSM)</strong> no : <strong>7146211498</strong> 
+        a.n <strong>SMK IT Ihsanul Fikri</strong>. 
+    </p>
+    <h3>Kode Unik Anda: {{ p_code }}</h3>
+    <hr />
+    <p>
+        Setelah transfer selesai, upload hasil scan / foto kuitansi pembayaran untuk diverifikasi
+        oleh panitia pada tombol dibawah ini serta lakukan konfirmasi pembayaran ke ustd. 
+        Yusuf (0856 4108 3527) atau ke ustd. Mahfud (0822 2093 0193).
+    </p>
+    <div class="row">
+    <div class="col">
+    <div class="card border-primary">
+        <div class="card-header">
+            Form Upload 
+        </div>
+        <div class="card-body" hx-push-url="false">
+            <form accept="image/*" method="post"action="{{ url_for('registrant.upload_kwitansi') }}"
+                enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="mb-3">
+                    <label class="form-label">Jumlah Pembayaran</label>
+                    <input type="number" name="jumlah" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Upload Kwitansi</label>
+                    <input type="file" name="file" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="card-footer">
+        &nbsp;
+        </div>
     </div>
+    </div>
+    </div>
+    {% else %}
+    <h1>Selamat, Anda telah menyelesaikan tahap pertama!</h1>
+    <p>
+        Terimakasih anda telah membayar biaya pendaftaran. Silahkan anda bisa mengisi data
+        dan menyelesaikan pendaftaran dengan mengeklik tombol dibawah :
+    </p>
+    <a class="btn btn-success" href="{{ url_for('registrant.isi_data') }}">Isi data</a>
+    <p>
+        Data yang perlu disiapkan adalah:
+    <ul>
+        <li>Data Diri</li>
+        <li>Data Orang Tua</li>
+        <li>Data Kartu Keluarga & Akte Kelahiran</li>
+        <li>Data Surat Pernyataan</li>
+        <li>Scan Sertifikat Hafalan/Prestasi untuk pendaftar beasiswa hafidz/prestasi</li>
+        <li>Scan Surat Keterangan Tidak Mampu untuk pendaftar beasiswa dhuafa</li>
+    </ul>
+    </p>
+    {% endif %}
+</div>
+</div>
 </div>
 {% endblock %}

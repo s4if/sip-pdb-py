@@ -1,10 +1,11 @@
-import datetime
+import datetime, os
 from flask import (
-    Blueprint, abort, flash, g, redirect, render_template, request, send_file, session, url_for
+    Blueprint, g, render_template, request, send_file, session, url_for
 )
 from sqlalchemy.exc import IntegrityError
 from .db import db
 from .helper import htmx, login_required
+from .config import uploaddir
 
 bp = Blueprint('registrant', __name__, url_prefix='/pendaftar')
 
@@ -12,19 +13,25 @@ bp = Blueprint('registrant', __name__, url_prefix='/pendaftar')
 @bp.route('/')
 @login_required
 def beranda():
-    return render_template('registrant/beranda.jinja', username=session['username'], is_htmx=htmx)
+    from .models import Registrant
+    rg = Registrant.query.filter_by(id=session['user_id']).first()
+    return render_template('registrant/beranda.jinja', 
+                           username=session['username'], 
+                           is_htmx=htmx, 
+                           reg_fee=rg.reg_fee, 
+                           p_code=str(rg.id).zfill(3)
+                           )
 
 @bp.route('/isi_data', methods=('GET', 'POST'))
 @login_required
 def isi_data():
     from .forms import RegistrantDataForm
     from .models import RegistrantData, Registrant
-    from .config import instancedir
-    import os
     
     rgd = RegistrantData.query.filter_by(id=session['user_id']).first()
     rg = Registrant.query.filter_by(id=session['user_id']).first()
-    pu = os.path.isfile(os.path.join(instancedir, 'foto', f'{session["user_id"]}_foto.png'))
+    datadir = os.path.join(uploaddir, session['username'])
+    pu = os.path.isfile(os.path.join(datadir, f'{session["user_id"]}_foto.png'))
     if request.method == 'GET':
         form = RegistrantDataForm(obj=rgd) if rgd else RegistrantDataForm()
         return render_template('registrant/isi_data.jinja', username=session['username'], form=form, photo_uploaded=pu, is_htmx=htmx)
@@ -355,34 +362,71 @@ def laman_upload():
 @login_required
 def proses_foto():
     from werkzeug.utils import secure_filename
-    from .config import instancedir
-    import os
     from PIL import Image
     
     f = request.files['file']
     filename = secure_filename(f.filename)
-    foto_dir = os.path.join(instancedir, 'foto')
-    if not os.path.isdir(foto_dir):
-        os.mkdir(foto_dir)
+    datadir = os.path.join(uploaddir, str(session['username']))
+    if not os.path.isdir(datadir):
+        os.mkdir(datadir)
     
     allowed_exts = {'.jpg', '.jpeg', '.png'}
     ext = os.path.splitext(filename)[1]
     if ext.lower() not in allowed_exts:
-        return 'STATUS: Error. <br>File harus bertipe .jpg, .jpeg, atau .png', 415
+        return 'STATUS: Error. <br>File harus bertipe .jpg, .jpeg, atau .png' #, 415
+        # kalau error, htmx tidak swap, semetara tidak ada pesan error
 
     img = Image.open(f)
     img = img.resize((600, 800), Image.LANCZOS)
-    img.save(os.path.join(foto_dir, f'{session["user_id"]}_foto.png'))
-    url_foto = url_for('registrant.get_foto')
+    img.save(os.path.join(datadir, f'{session["user_id"]}_foto.png'))
+    url_foto = url_for('registrant.get_foto', tipe='foto')
     return f'STATUS: Foto Berhasil di Update. <a class="btn btn-info btn-sm" target="_blank" href="{url_foto}">Lihat Foto</a>', 200
 
-@bp.route('/get_foto')
+@bp.route('/get_foto/<string:tipe>')
 @login_required
-def get_foto():
-    from .config import instancedir
-    import os
-    
-    if os.path.isfile(os.path.join(instancedir, 'foto', f'{session["user_id"]}_foto.png')):
-        return send_file(os.path.join(instancedir, 'foto', f'{session["user_id"]}_foto.png'), mimetype='image/png')
+def get_foto(tipe):
+    datadir = os.path.join(uploaddir, str(session['username']))
+    if os.path.isfile(os.path.join(datadir, f'{session["user_id"]}_{tipe}.png')):
+        return send_file(os.path.join(datadir, f'{session["user_id"]}_{tipe}.png'), mimetype='image/png')
     else:
         return 'Foto tidak ditemukan', 404
+    
+@bp.route('/upload_kwitansi', methods=['POST'])
+@login_required
+def upload_kwitansi():
+    from werkzeug.utils import secure_filename
+    from PIL import Image
+    from .models import Registrant
+    
+    rg = Registrant.query.filter_by(id=session['user_id']).first()    
+    f = request.files['file']
+    jumlah = request.form['jumlah']
+    rg.reg_fee = jumlah
+    db.session.add(rg)
+    db.session.commit()
+    filename = secure_filename(f.filename)
+    datadir = os.path.join(uploaddir, str(session['username']))
+    if not os.path.isdir(datadir):
+        os.mkdir(datadir)
+    
+    allowed_exts = {'.jpg', '.jpeg', '.png'}
+    ext = os.path.splitext(filename)[1]
+    if ext.lower() not in allowed_exts:
+        return render_template('registrant/beranda.jinja', 
+                           username=session['username'], 
+                           is_htmx=htmx, 
+                           reg_fee=rg.reg_fee, 
+                           p_code=str(rg.id).zfill(3),
+                           error='File harus bertipe .jpg, .jpeg, atau .png'
+                           ) 
+
+    img = Image.open(f)
+    img = img.resize((600, 800), Image.LANCZOS)
+    img.save(os.path.join(datadir, f'{session["user_id"]}_kwitansi.png'))
+    return render_template('registrant/beranda.jinja', 
+                           username=session['username'], 
+                           is_htmx=htmx, 
+                           reg_fee=rg.reg_fee, 
+                           p_code=str(rg.id).zfill(3),
+                           success='Kwitansi Berhasil di Upload.'
+                           )

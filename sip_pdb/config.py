@@ -1,6 +1,11 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 instancedir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../instance/'))
+if not os.path.isdir(instancedir):
+    os.mkdir(instancedir)
+uploaddir = os.path.abspath(os.path.join(instancedir, 'uploads'))
+if not os.path.isdir(uploaddir):
+        os.mkdir(uploaddir)
 # Config for the flask
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'

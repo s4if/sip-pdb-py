@@ -28,6 +28,7 @@ class Registrant(db.Model):
     entry_year = db.Column(db.Integer, nullable=False)
     verified = db.Column(db.Boolean, nullable=False, default=False)
     finalized = db.Column(db.Boolean, nullable=False, default=False)
+    reg_fee = db.Column(db.BigInteger, nullable=False, default=0) # biaya pendaftaran (registration fee)
     deleted = db.Column(db.Boolean, nullable=False, default=False)
     gelombang = db.Column(db.Integer, nullable=False)
     registration_time = db.Column(db.DateTime, nullable=False)
