@@ -1,0 +1,37 @@
+{% if not is_htmx %}
+    {% extends "registrant/layout.jinja" %}
+    {% block title %}Upload Dokumen & Foto{% endblock %}
+{% else %}
+    <title>Upload Dokumen & Foto</title>
+{% endif %}
+
+{% from 'macros.jinja' import render_notif %}
+
+{% block content %}
+
+{{ render_notif(error, success, info) }}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('registrant.beranda') }}">Beranda</a></li>
+        <li class="breadcrumb-item active">Upload Dokumen & Foto</li>
+    </ol>
+</nav>
+<h1 class="h2">Upload Foto </h1>
+<p>Silahkan Upload Dokumen dan Foto disini</p>
+
+<div class="row">
+    <div class="<col>">
+        <div class="card">
+        <div class="card-header">
+            Featured
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Special title treatment</h5>
+            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

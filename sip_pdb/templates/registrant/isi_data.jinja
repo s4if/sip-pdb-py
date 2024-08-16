@@ -22,7 +22,7 @@
 
 <div class="row justify-content-start">
     <div class="col">
-        <div class="card">
+        <div class="card border-primary">
         <div class="card-header">
             Unggah Foto
         </div>
@@ -46,9 +46,9 @@
                 </li>
                 <li class="list-group-item" id="img_content" hx-boost="false">
                 {% if photo_uploaded %}
-                STATUS: sudah upload. 
+                <p class="text-bg-success">STATUS: sudah upload. </p>
                 <a class="btn btn-info btn-sm" target="_blank" href="{{ url_for('registrant.get_foto', tipe='foto') }}">Lihat Foto</a>
-                {% else %} STATUS: Belum Upload {% endif %}
+                {% else %} <div class="text-bg-warning"> STATUS: Belum Upload foto, Silahkan Upload Terlebih Dahulu. </div>{% endif %}
                 </li>
             </ul>
         </div>

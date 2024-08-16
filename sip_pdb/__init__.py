@@ -1,4 +1,4 @@
-import os
+import os, datetime
 
 from flask import Flask, session, redirect, url_for
 from . import auth, registrant
@@ -31,6 +31,10 @@ def create_app(test_config=None):
     @app.route('/hello')
     def hello():
         return 'Hello, World!'
+    
+    @app.template_filter('format_date')
+    def format_date(date_obj: datetime.date):
+        return date_obj.strftime('%d %B %Y')
     
     @app.route('/home')
     @login_required
