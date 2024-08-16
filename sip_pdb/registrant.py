@@ -18,7 +18,8 @@ def beranda():
     return render_template('registrant/beranda.jinja', 
                            username=session['username'], 
                            is_htmx=htmx, 
-                           reg_fee=rg.reg_fee, 
+                           reg_fee=rg.reg_fee,
+                           finalized=rg.finalized,
                            p_code=str(rg.id).zfill(3)
                            )
 
@@ -278,26 +279,26 @@ def isi_pernyataan():
     rg = Registrant.query.filter_by(id=session['user_id']).first()
     if request.method == 'POST':
         failure = []
-        fv['icost'] = request.form['raw_icost']
-        if request.form['raw_icost'] not in range(int(bpm['infaq_pendidikan']), int(bpm['infaq_pendidikan'])+2000001):
+        fv['icost'] = int(request.form['raw_icost'])
+        if fv['icost'] not in range(bpm['infaq_pendidikan'], bpm['infaq_pendidikan']+2000001):
             fv['icost'] = int(request.form['other_icost'])
-            if fv['icost'] < int(bpm['infaq_pendidikan']) + 2000000:
+            if fv['icost'] < bpm['infaq_pendidikan'] + 2000000:
                 failure.append('Isian Khusus Infaq Pendidikan tidak boleh kurang dari Rp. ' +
-                               "{:,.0f}".format(int(bpm['infaq_pendidikan']) + 2000000).replace(",", ".") + ',-')
+                               "{:,.0f}".format(bpm['infaq_pendidikan'] + 2000000).replace(",", ".") + ',-')
                 
-        fv['scost'] = request.form['raw_scost']
-        if request.form['raw_scost'] not in range(int(bpm['spp']), int(bpm['spp'])+1000001):
+        fv['scost'] = int(request.form['raw_scost'])
+        if fv['scost'] not in range(bpm['spp'], bpm['spp']+1000001):
             fv['scost'] = int(request.form['other_scost'])
-            if fv['scost'] < int(bpm['spp']) + 1000000:
+            if fv['scost'] < bpm['spp'] + 1000000:
                 failure.append('Isian Khusus SPP tidak boleh kurang dari Rp. ' +
-                               "{:,.0f}".format(int(bpm['spp']) + 1000000).replace(",", ".") + ',-')
+                               "{:,.0f}".format(bpm['spp'] + 1000000).replace(",", ".") + ',-')
                 
-        fv['lcost'] = request.form['raw_lcost']
-        if request.form['raw_lcost'] not in range(int(bpm['wakaf_tanah']), int(bpm['wakaf_tanah'])+1000001):
+        fv['lcost'] = int(request.form['raw_lcost'])
+        if fv['lcost'] not in range(bpm['wakaf_tanah'], bpm['wakaf_tanah']+1000001):
             fv['lcost'] = int(request.form['other_lcost'])
-            if fv['lcost'] < int(bpm['wakaf_tanah']) + 1000000:
+            if fv['lcost'] < bpm['wakaf_tanah'] + 1000000:
                 failure.append('Isian Khusus Wakaf Tanah tidak boleh kurang dari Rp. ' +
-                               "{:,.0f}".format(int(bpm['wakaf_tanah']) + 1000000).replace(",", ".") + ',-')
+                               "{:,.0f}".format(bpm['wakaf_tanah'] + 1000000).replace(",", ".") + ',-')
                 
         fv['main_parent'] = request.form['main_parent']
         if failure != []:
@@ -351,7 +352,21 @@ def isi_pernyataan():
 @bp.route('/rekap')
 @login_required
 def rekap():
-    return render_template('registrant/rekap.jinja', username=session['username'], is_htmx=htmx)
+    from .models import Registrant, RegistrantData, Parent
+    rg = Registrant.query.filter_by(id=session['user_id']).first()
+    rgd = RegistrantData.query.filter_by(id=session['user_id']).first()
+    parent_data = {}
+    fd = Parent.query.filter_by(id=str(session['user_id'])+'_ayah').first()
+    if fd: parent_data['Ayah'] = fd
+    md = Parent.query.filter_by(id=str(session['user_id'])+'_ibu').first()
+    if md: parent_data['Ibu'] = md
+    wd = Parent.query.filter_by(id=str(session['user_id'])+'_wali').first()
+    if wd: parent_data['Wali'] = wd
+    return render_template('registrant/rekap.jinja', username=session['username'], 
+                           is_htmx=htmx, 
+                           rg=rg,
+                           rgd=rgd, 
+                           pd=parent_data)
 
 @bp.route('/laman_upload')
 @login_required
@@ -415,7 +430,8 @@ def upload_kwitansi():
         return render_template('registrant/beranda.jinja', 
                            username=session['username'], 
                            is_htmx=htmx, 
-                           reg_fee=rg.reg_fee, 
+                           reg_fee=rg.reg_fee,
+                           finalized=rg.finalized,
                            p_code=str(rg.id).zfill(3),
                            error='File harus bertipe .jpg, .jpeg, atau .png'
                            ) 
@@ -426,7 +442,8 @@ def upload_kwitansi():
     return render_template('registrant/beranda.jinja', 
                            username=session['username'], 
                            is_htmx=htmx, 
-                           reg_fee=rg.reg_fee, 
+                           reg_fee=rg.reg_fee,
+                           finalized=rg.finalized,
                            p_code=str(rg.id).zfill(3),
                            success='Kwitansi Berhasil di Upload.'
                            )
