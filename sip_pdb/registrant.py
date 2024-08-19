@@ -416,7 +416,9 @@ def upload_kwitansi():
     rg = Registrant.query.filter_by(id=session['user_id']).first()    
     f = request.files['file']
     jumlah = request.form['jumlah']
+    tgl_bayar = request.form['tgl_bayar']
     rg.reg_fee = jumlah
+    rg.reg_payment_date = datetime.datetime.strptime(tgl_bayar, '%Y-%m-%d').date()
     db.session.add(rg)
     db.session.commit()
     filename = secure_filename(f.filename)
