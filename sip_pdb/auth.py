@@ -40,6 +40,11 @@ def register():
         error="Registrasi gagal. Kolom Captcha tidak sesuai"
         return render_template('login/register.jinja', form = form, error=error, cap_img=cap_img)
     
+    if request.form['gender'] != 'L':
+        cap_img = create_captcha()
+        error="Mohon maaf, SMKIT Ihsanul Fikri Saat ini hanya menerima peserta didik <strong>Putra</strong> saja."
+        return render_template('login/register.jinja', form = form, error=error, cap_img=cap_img)
+    
     # TODO: buka dokumentasi kemudian sempurnakan dengan hash yang lebih aman
     hashed_password = generate_password_hash(request.form['password'], method='pbkdf2:sha256', salt_length=16) 
     from .models import Registrant
