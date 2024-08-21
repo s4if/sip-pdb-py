@@ -1,0 +1,45 @@
+{% if not is_htmx %}
+    {% extends "registrant/layout.jinja" %}
+    {% block title %}Konfirmasi Finalisasi{% endblock %}
+{% else %}
+    <title>Konfirmasi Finalisasi</title>
+{% endif %}
+
+{% from 'macros.jinja' import render_notif %}
+
+{% block content %}
+
+{{ render_notif(error, success, info) }}
+
+<div class="row">
+    <div class="col">
+    <div class="card bg-warning">
+        <div class="card-header">
+            Konfirmasi Finalisasi
+        </div>
+        <div class="card-body">
+            <h5 class="card-title"></h5>
+            <p class="card-text">Setelah melakukan Finalisasi, data tidak bisa diedit lagi.
+            <br>Apakah anda yakin?</p>
+            <div class="row" hx-boost="false">
+                <div class="col">
+                    <form method="POST" action="{{ url_for('registrant.finalisasi') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="ckb" id="ckb" required>
+                        <label class="form-check-label">
+                        Saya Yakin data yang dimasukkan sudah benar.
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent border-warning">
+            &nbsp;
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

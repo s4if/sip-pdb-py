@@ -87,6 +87,7 @@ def login():
             session['name'] = r.name
             session['logged_in'] = True
             session['is_admin'] = False
+            session['show_menu'] = r.reg_fee > 0 and not r.finalized # TODO: cek lagi logic-nya
             return redirect(url_for('registrant.beranda'))
         else:
             error = 'Invalid username or password'

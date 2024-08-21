@@ -84,6 +84,7 @@
                             <span class="ml-2">Beranda</span>
                           </a>
                         </li>
+                        {% if show_menu %}
                         <li class="nav-item">
                           <a class="nav-link"
                             hx-get="{{ url_for('registrant.isi_data') }}"
@@ -112,6 +113,7 @@
                             <span class="ml-2">Surat Pernyataan</span>
                           </a>
                         </li>
+                        {% endif %}
                         <li class="nav-item">
                           <a class="nav-link"
                             hx-get="{{ url_for('registrant.rekap') }}"

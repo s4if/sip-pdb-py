@@ -9,6 +9,9 @@ from .config import uploaddir
 
 bp = Blueprint('registrant', __name__, url_prefix='/pendaftar')
 
+# TODO: Implementasi blok belum-bayar per rute
+# saat ini mainkan menu saja
+
 
 @bp.route('/')
 @login_required
@@ -17,7 +20,8 @@ def beranda():
     rg = Registrant.query.filter_by(id=session['user_id']).first()
     return render_template('registrant/beranda.jinja', 
                            username=session['username'], 
-                           is_htmx=htmx, 
+                           is_htmx=htmx,
+                           show_menu=session['show_menu'],
                            reg_fee=rg.reg_fee,
                            finalized=rg.finalized,
                            p_code=str(rg.id).zfill(3)
@@ -35,12 +39,23 @@ def isi_data():
     pu = os.path.isfile(os.path.join(datadir, f'{session["user_id"]}_foto.png'))
     if request.method == 'GET':
         form = RegistrantDataForm(obj=rgd) if rgd else RegistrantDataForm()
-        return render_template('registrant/isi_data.jinja', username=session['username'], form=form, photo_uploaded=pu, is_htmx=htmx)
+        return render_template(
+            'registrant/isi_data.jinja', 
+            username=session['username'], 
+            form=form, 
+            photo_uploaded=pu, 
+            is_htmx=htmx,
+            show_menu=session['show_menu'],)
     
     form = RegistrantDataForm(request.form)
     if not form.validate():
         error="Penyimpanan data gagal. Silahkan cek lagi data anda"
-        return render_template('registrant/isi_data.jinja', username=session['username'], form=form, error=error, photo_uploaded=pu, is_htmx=htmx)
+        return render_template('registrant/isi_data.jinja', 
+                                show_menu=session['show_menu'],
+                                username=session['username'], 
+                                form=form, error=error, 
+                                photo_uploaded=pu, 
+                                is_htmx=htmx)
         
     if not rgd:
         rgd = RegistrantData()
@@ -81,13 +96,14 @@ def isi_data():
             'registrant/notif.jinja', 
             username=session['username'],
             step="Data Pendaftar",
+            show_menu=session['show_menu'],
             next_url=url_for('registrant.isi_ortu', tipe='ayah'),
             prev_url=url_for('registrant.isi_data'),
             is_htmx=htmx
         )
     except IntegrityError:
         error="Penyimpanan data gagal, ada data yang salah. Silahkan coba lagi"
-        return render_template('registrant/isi_data.jinja', username=session['username'], error=error, photo_uploaded=pu, is_htmx=htmx)
+        return render_template('registrant/isi_data.jinja', show_menu=session['show_menu'], username=session['username'], error=error, photo_uploaded=pu, is_htmx=htmx)
     
 @bp.route('/clone_alamat', methods=['GET'])
 @login_required
@@ -113,7 +129,7 @@ def clone_alamat():
 def isi_ortu(tipe):
     if tipe not in ['ayah', 'ibu','wali']:
         error="Mohon maaf, url tidak ditemukan."
-        return render_template('registrant/beranda.jinja', error=error, is_htmx=htmx)
+        return render_template('registrant/beranda.jinja', show_menu=session['show_menu'], error=error, is_htmx=htmx)
     
     from .models import Parent, Registrant
     from .forms import ParentForm
@@ -154,6 +170,7 @@ def isi_ortu(tipe):
             'registrant/isi_ortu.jinja', 
             username=session['username'], 
             form=form,
+            show_menu=session['show_menu'],
             form_url=url_for('registrant.isi_ortu', tipe=tipe),
             tipe=tipe, 
             is_htmx=htmx,
@@ -170,6 +187,7 @@ def isi_ortu(tipe):
             form=form,
             form_url=url_for('registrant.isi_ortu', tipe=tipe),
             tipe=tipe, 
+            show_menu=session['show_menu'],
             is_htmx=htmx,
             error="Penyimpanan data gagal. Silahkan cek lagi data anda"
         )
@@ -233,6 +251,7 @@ def isi_ortu(tipe):
             'registrant/notif.jinja', 
             username=session['username'],
             step=step,
+            show_menu=session['show_menu'],
             next_url=next_url,
             prev_url=prev_url,
             opt_url=opt_url,
@@ -245,21 +264,13 @@ def isi_ortu(tipe):
         return render_template(
             'registrant/isi_ortu.jinja', 
             username=session['username'], 
+            show_menu=session['show_menu'],
             form=form, 
             error=error, 
             tipe=tipe, 
             is_htmx=htmx
             )
-    
-    
-    
-
-#hanya biar gak error, nanti dihapus
-@bp.route('/isi_wali')
-@login_required
-def isi_wali():
-    return render_template('registrant/isi_wali.jinja', username=session['username'], is_htmx=htmx)
-
+        
 @bp.route('/isi_pernyataan', methods=('GET', 'POST'))
 @login_required
 def isi_pernyataan():
@@ -328,7 +339,8 @@ def isi_pernyataan():
                 step=step,
                 next_url=next_url,
                 prev_url=prev_url,
-                is_htmx=htmx
+                is_htmx=htmx,
+                show_menu=session['show_menu']
             )
     
     fv['icost'] = rg.initial_cost if rg.initial_cost else 0
@@ -344,6 +356,7 @@ def isi_pernyataan():
         bpm=bpm,
         fv=fv,
         error=error,
+        show_menu=session['show_menu'],
         tahun_masuk=tahun_masuk,
         **biaya_tetap
         )
@@ -357,13 +370,17 @@ def rekap():
     rgd = RegistrantData.query.filter_by(id=session['user_id']).first()
     parent_data = {}
     fd = Parent.query.filter_by(id=str(session['user_id'])+'_ayah').first()
-    if fd: parent_data['Ayah'] = fd
+    if fd: 
+        if fd.birth_date : parent_data['Ayah'] = fd
     md = Parent.query.filter_by(id=str(session['user_id'])+'_ibu').first()
-    if md: parent_data['Ibu'] = md
+    if md: 
+        if md.birth_date : parent_data['Ibu'] = md
     wd = Parent.query.filter_by(id=str(session['user_id'])+'_wali').first()
-    if wd: parent_data['Wali'] = wd
+    if wd: 
+        if wd.birth_date : parent_data['Wali'] = wd
     return render_template('registrant/rekap.jinja', username=session['username'], 
                            is_htmx=htmx, 
+                           show_menu=session['show_menu'],
                            rg=rg,
                            rgd=rgd, 
                            pd=parent_data)
@@ -371,7 +388,7 @@ def rekap():
 @bp.route('/laman_upload')
 @login_required
 def laman_upload():
-    return render_template('registrant/laman_upload.jinja', username=session['username'], is_htmx=htmx)
+    return render_template('registrant/laman_upload.jinja', show_menu=session['show_menu'], username=session['username'], is_htmx=htmx)
 
 @bp.route('/proses_foto', methods=['POST'])
 @login_required
@@ -431,7 +448,8 @@ def upload_kwitansi():
     if ext.lower() not in allowed_exts:
         return render_template('registrant/beranda.jinja', 
                            username=session['username'], 
-                           is_htmx=htmx, 
+                           is_htmx=htmx,
+                           show_menu=session['show_menu'],
                            reg_fee=rg.reg_fee,
                            finalized=rg.finalized,
                            p_code=str(rg.id).zfill(3),
@@ -441,11 +459,53 @@ def upload_kwitansi():
     img = Image.open(f)
     img = img.resize((600, 800), Image.LANCZOS)
     img.save(os.path.join(datadir, f'{session["user_id"]}_kwitansi.png'))
+    session['show_menu'] = not rg.finalized
     return render_template('registrant/beranda.jinja', 
                            username=session['username'], 
                            is_htmx=htmx, 
+                           show_menu=session['show_menu'],
                            reg_fee=rg.reg_fee,
                            finalized=rg.finalized,
                            p_code=str(rg.id).zfill(3),
                            success='Kwitansi Berhasil di Upload.'
                            )
+    
+@bp.route('/finalisasi', methods=['POST', 'GET'])
+@login_required
+def finalisasi():
+    from .models import Registrant
+    rg = Registrant.query.filter_by(id=session['user_id']).first()
+    if request.method == 'GET':
+        if rg.finalized:
+            return render_template('registrant/beranda.jinja', 
+                            username=session['username'], 
+                            is_htmx=htmx,
+                            show_menu=session['show_menu'],
+                            reg_fee=rg.reg_fee,
+                            finalized=rg.finalized,
+                            p_code=str(rg.id).zfill(3),
+                            error='Anda telah menyelesaikan pendaftaran.'
+                            )
+        else:
+            return render_template(
+                'registrant/finalisasi.jinja',
+                show_menu=session['show_menu'],
+                username=session['username'], 
+                is_htmx=htmx, 
+                )
+        
+        
+    if request.method == 'POST':
+        rg.finalized = True
+        db.session.add(rg)
+        db.session.commit()
+        session['show_menu'] = False
+        return render_template('registrant/beranda.jinja', 
+                            username=session['username'], 
+                            is_htmx=htmx, 
+                            show_menu=session['show_menu'],
+                            reg_fee=rg.reg_fee,
+                            finalized=rg.finalized,
+                            p_code=str(rg.id).zfill(3),
+                            success='Anda telah menyelesaikan pendaftaran.'
+                            )

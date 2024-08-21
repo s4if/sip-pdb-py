@@ -42,7 +42,7 @@
         Tes PPDB akan dilaksanakan pada tanggal 11 Februari 2024<br/>
         Silahkan Unduh dan cetak formulir dan kartu pendaftaran.
     </p>        
-    <a class="btn btn-primary" href="{{ url_for('print_data_pendaftaran', id=id) }}">
+    <a class="btn btn-primary" href="">
         Unduh Kartu Dan Formulir Pendaftaran</a>
     {% elif reg_fee == 0 %}
     <h1>Selamat Datang di Sistem PPDB SMKIT Ihsanul Fikri Mungkid</h1>
@@ -66,7 +66,7 @@
         <div class="card-header">
             Form Upload 
         </div>
-        <div class="card-body" hx-push-url="false">
+        <div class="card-body" hx-push-url="false" hx-boost="false">
             <form accept="image/*" method="post"action="{{ url_for('registrant.upload_kwitansi') }}"
                 enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
