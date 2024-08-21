@@ -90,10 +90,10 @@ class RegistrantDataForm(FlaskForm):
         ('Kerabat', 'Kerabat'),
         ('Lainnya', 'Lainnya')
     ])
-    #hobbies = StringField('Hobi')
+    hobbies = StringField('Hobi')
     #achievements = StringField('Prestasi')
-    #hospital_sheets = StringField('Riwayat Kesehatan')
-    #physical_abnormalities = StringField('Kelainan Jasmani')
+    hospital_sheets = StringField('Riwayat Kesehatan')
+    physical_abnormalities = StringField('Kelainan Jasmani')
     
 class ParentForm(FlaskForm):
     type = HiddenField('Type', validators=[DataRequired()])

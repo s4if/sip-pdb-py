@@ -83,7 +83,9 @@ def isi_data():
     rgd.weight = request.form['weight']
     rgd.head_size = request.form['head_size']
     rgd.stay_with = request.form['stay_with']
-    # TODO: hobi, prestasi, catatan kesihatan, kelainan jasmani
+    rgd.hobbies = request.form['hobbies']
+    rgd.hospital_sheets = request.form['hospital_sheets']
+    rgd.physical_abnormalities = request.form['physical_abnormalities']
 
     # commit ke database
     try: 
