@@ -116,3 +116,18 @@ class Parent(db.Model):
     
     def __repr__(self):
         return '<User {}>'.format(self.name)
+    
+
+class Document(db.Model):
+    __tablename__ = 'documents'
+    id = db.Column(db.Integer, primary_key=True)
+    registrant_id = db.Column(db.Integer, db.ForeignKey('registrants.id'), nullable=False)
+    registrant = db.relationship('Registrant', foreign_keys=[registrant_id], backref=db.backref('documents', lazy=True))
+    type = db.Column(db.String(15), nullable=False)
+    filename = db.Column(db.String(255), nullable=False)
+    issued_date = db.Column(db.Date, nullable=False)
+    note = db.Column(db.String(1024), nullable=False)
+    
+    def __repr__(self):
+        return '<Document {} for {}>'.format(self.id, self.registrant.name)
+    

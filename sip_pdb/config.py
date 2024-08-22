@@ -14,6 +14,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
 # config for the apps (always arrays)
+# TODO: migrate config to toml file!
 PDB_CONFIG = {
     'nama_sekolah' : 'SMKIT Ihsanul Fikri Mungkid',
     'nama_gelombang': 'Gelombang 1',

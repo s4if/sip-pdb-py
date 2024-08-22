@@ -5,7 +5,7 @@
     <title>Upload Dokumen & Foto</title>
 {% endif %}
 
-{% from 'macros.jinja' import render_notif %}
+{% from 'macros.jinja' import render_notif, render_field %}
 
 {% block content %}
 
@@ -21,17 +21,120 @@
 <p>Silahkan Upload Dokumen dan Foto disini</p>
 
 <div class="row">
-    <div class="<col>">
+    <div class="col">
         <div class="card">
         <div class="card-header">
-            Featured
+            Unggah Dokumen Baru
         </div>
         <div class="card-body">
-            <h5 class="card-title">Special title treatment</h5>
-            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+            <div class="row">
+            <div class="col">
+            <form method="POST" action="{{ url_for('registrant.upload_dokumen')}}" enctype="multipart/form-data" accept="image/*">
+            {{ form.csrf_token }}
+            <div class="row mb-3">
+                <label class="col-md-2 col-sm-3 col-form-label">Tipe Dokumen</label>
+                <div class="col-md-8 col-sm-7">
+                    {{ form.type(class="form-select") }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-md-2 col-sm-3 col-form-label">File</label>
+                <div class="col-md-8 col-sm-7">
+                    <input class="form-control" type="file" id="file" name="file" required>
+                </div>
+            </div>
+            {{ render_field(form.issued_date) }}
+            <div class="row mb-3 ml-3">
+                {{ form.note.label(class_='col-md-2 col-sm-3 col-form-label') }}
+                <div class="col-md-9 col-sm-8">
+                {{ form.note(class_='form-control' + (' is-invalid' if form.note.errors else '') + ' gx-10')|safe }}
+                </div>
+                {% if form.note.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.note.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-2 col-sm-3">&nbsp;</div>
+                <div class="col-md-8 col-sm-7">
+                    <p>
+                        Pada input Keterangan,<br>
+                        Untuk Sertifikat Hafalan silahkan masukkan data:
+                    </p>
+                    <ol>
+                        <li>Lembaga Sertifikasi Hafalan</li>
+                        <li>Juz</li>
+                    </ol>
+                    <p>
+                        Untuk Sertifikat Prestasi silahkan masukkan data:
+                    </p>
+                    <ol>
+                        <li>Lembaga Penyelenggara Lomba</li>
+                        <li>Bidang Lomba</li>
+                        <li>Tingkat Lomba</li>
+                        <li>Peringkat</li>
+                    </ol>
+                    <p>Terimakasih.</p>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            </div>
+            </div>
         </div>
         </div>
     </div>
 </div>
+
+{% for doc in docs %}
+<div class="row">
+    <div class="col">
+    &nbsp;
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+        <div class="card-header">
+            {{doc.filename}}
+        </div>
+        <div class="card-body">
+        <div class="row">
+        <div class="col">
+            <table>
+            <tr><td>Namafile</td><td>&nbsp;:&nbsp;</td><td>{{doc.filename}}</td></tr>
+            <tr><td>Tipe</td><td>&nbsp;:&nbsp;</td><td>{{doc.type}}</td></tr>
+            <tr><td>Tanggal Terbit</td><td>&nbsp;:&nbsp;</td><td>{{doc.issued_date}}</td></tr>
+            <tr><td>Keterangan</td><td>&nbsp;:&nbsp;</td><td>{{doc.note}}</td></tr>
+            </table>
+        </div>
+        </div>
+        <div class="row">
+        <div class="col">
+        <img src="{{ url_for('registrant.get_doc', filename=doc.filename)}}" class="img-fluid">
+        </div>
+        </div>
+        <div class="row">
+        <div class="col" >
+        &nbsp;
+        </div>
+        </div>
+        <div class="row">
+        <div class="col" hx-push-url="false">
+        <button class="btn btn-danger" hx-get="{{url_for('registrant.delete_document', filename=doc.filename)}}" 
+        hx-confirm="Apakah anda yakin untuk menghapus dokumen?">
+        <!-- beneran pake hx-get? -->
+            Hapus Dokumen
+        </button>
+        </div>
+        </div>
+        </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
 {% endblock %}

@@ -1,6 +1,6 @@
 import datetime, os
 from flask import (
-    Blueprint, g, render_template, request, send_file, session, url_for
+    Blueprint, g, render_template, request, send_file, session, url_for, send_from_directory
 )
 from sqlalchemy.exc import IntegrityError
 from .db import db
@@ -11,6 +11,11 @@ bp = Blueprint('registrant', __name__, url_prefix='/pendaftar')
 
 # TODO: Implementasi blok belum-bayar per rute
 # saat ini mainkan menu saja
+# TODO: Halaman Upload Sertifikat Prestasi dan Hafalan
+'''
+Skema Model: id, tgl_terbit, keterangan
+User suruh buat keterangan sendiri?
+'''
 
 
 @bp.route('/')
@@ -387,11 +392,6 @@ def rekap():
                            rgd=rgd, 
                            pd=parent_data)
 
-@bp.route('/laman_upload')
-@login_required
-def laman_upload():
-    return render_template('registrant/laman_upload.jinja', show_menu=session['show_menu'], username=session['username'], is_htmx=htmx)
-
 @bp.route('/proses_foto', methods=['POST'])
 @login_required
 def proses_foto():
@@ -419,9 +419,32 @@ def proses_foto():
 @bp.route('/get_foto/<string:tipe>')
 @login_required
 def get_foto(tipe):
+    # Validate the tipe parameter to prevent arbitrary file access
+    if tipe not in ['foto', 'kwitansi']:  # add valid types here
+        return 'Tipe tidak valid', 400
+
     datadir = os.path.join(uploaddir, str(session['username']))
-    if os.path.isfile(os.path.join(datadir, f'{session["user_id"]}_{tipe}.png')):
-        return send_file(os.path.join(datadir, f'{session["user_id"]}_{tipe}.png'), mimetype='image/png')
+    filepath = os.path.join(datadir, f'{session["user_id"]}_{tipe}.png')
+
+    # Check if the file exists and is a file (not a directory)
+    if os.path.isfile(filepath) and not os.path.isdir(filepath):
+        # Use send_from_directory to prevent directory traversal attacks
+        return send_from_directory(datadir, f'{session["user_id"]}_{tipe}.png', mimetype='image/png')
+    else:
+        return 'Foto tidak ditemukan', 404
+
+
+@bp.route('/get_doc/<string:filename>')
+@login_required
+def get_doc(filename):
+    datadir = os.path.join(uploaddir, str(session['username']))
+    filepath = os.path.join(datadir, filename)
+    if os.path.isfile(filepath):
+        # Validate the file type to prevent arbitrary file access
+        if not filename.endswith(('.png')):
+            return 'Tipe file tidak valid', 400
+        # Use send_from_directory to prevent directory traversal attacks
+        return send_from_directory(datadir, filename, mimetype='image/png')
     else:
         return 'Foto tidak ditemukan', 404
     
@@ -458,8 +481,7 @@ def upload_kwitansi():
                            error='File harus bertipe .jpg, .jpeg, atau .png'
                            ) 
 
-    img = Image.open(f)
-    img = img.resize((600, 800), Image.LANCZOS)
+    img = Image.open(f) # kwitansi jangan resize
     img.save(os.path.join(datadir, f'{session["user_id"]}_kwitansi.png'))
     session['show_menu'] = not rg.finalized
     return render_template('registrant/beranda.jinja', 
@@ -511,3 +533,118 @@ def finalisasi():
                             p_code=str(rg.id).zfill(3),
                             success='Anda telah menyelesaikan pendaftaran.'
                             )
+        
+@bp.route('/upload_dokumen', methods=['POST', 'GET'])
+@login_required
+def upload_dokumen():
+    from .models import Document
+    from .forms import DocumentForm
+    from werkzeug.utils import secure_filename
+    from sqlalchemy.exc import IntegrityError
+    from PIL import Image
+    form = DocumentForm()
+    docs = Document.query.filter_by(registrant_id=session['user_id']).all()
+    if request.method == 'GET':
+        return render_template(
+            'registrant/laman_upload.jinja', 
+            show_menu=session['show_menu'], 
+            username=session['username'],
+            docs=docs,
+            form=form,
+            is_htmx=htmx
+        )
+    
+    if request.method == 'POST':
+        doc = Document()
+        doc.registrant_id = session['user_id']
+        doc.type = request.form['type']
+        doc.issued_date = datetime.datetime.strptime(request.form['issued_date'], '%Y-%m-%d').date()
+        doc.note = request.form['note']
+        
+        f = request.files['file']
+        filename = secure_filename(f.filename)
+        
+        datadir = os.path.join(uploaddir, str(session['username']))
+        if not os.path.isdir(datadir):
+            os.mkdir(datadir)
+    
+        allowed_exts = {'.jpg', '.jpeg', '.png'}
+        ext = os.path.splitext(filename)[1]
+        if ext.lower() not in allowed_exts:
+            error = 'File harus bertipe .jpg, .jpeg, atau .png'
+            return render_template(
+                'registrant/laman_upload.jinja', 
+                show_menu=session['show_menu'], 
+                username=session['username'],
+                docs=docs,
+                form=form,
+                error=error,
+                is_htmx=htmx
+            )
+        img = Image.open(f)
+        hashstr = generate_hash()
+        typestr = doc.type
+        typestr = typestr.lower().replace(' ', '_')
+        filename = f'{session["user_id"]}_{typestr}_{hashstr}.png'
+        doc.filename = filename
+        try :
+            db.session.add(doc)
+            db.session.commit()
+            img.save(os.path.join(datadir, filename))
+        except IntegrityError:
+            db.session.rollback()
+            error = 'Terjadi kesalahan dalam penyimpanan di database'
+            return render_template(
+                'registrant/laman_upload.jinja', 
+                show_menu=session['show_menu'], 
+                username=session['username'],
+                docs=docs,
+                form=form,
+                error=error,
+                is_htmx=htmx
+            )
+        docs.append(doc)
+        success = 'Dokumen Berhasil di Upload.'
+        return render_template(
+            'registrant/laman_upload.jinja', 
+            show_menu=session['show_menu'], 
+            username=session['username'],
+            docs=docs,
+            form=form,
+            success=success,
+            is_htmx=htmx
+        )
+
+@bp.route('/delete_document/<string:filename>', methods=['GET'])
+@login_required
+def delete_document(filename):
+    from .models import Document
+    from .forms import DocumentForm
+    doc = Document.query.filter_by(filename=filename).first()
+    db.session.delete(doc)
+    db.session.commit()
+    datadir = os.path.join(uploaddir, str(session['username']))
+    filepath = os.path.join(datadir, filename)
+    if os.path.isfile(filepath):
+        os.remove(filepath)
+    
+    form = DocumentForm()
+    success = 'Dokumen Berhasil di Hapus.'
+    docs = Document.query.filter_by(registrant_id=session['user_id']).all()
+    return render_template(
+            'registrant/laman_upload.jinja', 
+            show_menu=session['show_menu'], 
+            username=session['username'],
+            docs=docs,
+            form=form,
+            success=success,
+            is_htmx=htmx
+        )
+
+def generate_hash():
+    import hashlib
+    import time
+    timestamp = int(time.time() * 1000)  # get current timestamp in milliseconds
+    hash_object = hashlib.md5(str(timestamp).encode())
+    hash_hex = hash_object.hexdigest()[:8]  # use first 8 characters of the hash
+    return hash_hex

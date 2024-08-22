@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import  RadioField, SelectField, StringField, PasswordField, IntegerField, DateField, HiddenField, BooleanField
+from wtforms import  RadioField, SelectField, StringField, PasswordField, IntegerField, DateField, HiddenField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, EqualTo, InputRequired, Length, ValidationError
 import phonenumbers
 
@@ -160,3 +160,11 @@ class LetterForm(FlaskForm):
     land_donation = IntegerField('Donasi Lahan', validators=[DataRequired()])
     qurban = StringField('Qurban', validators=[DataRequired()])
     buy_laptop = BooleanField('Beli Laptop')
+    
+class DocumentForm(FlaskForm):
+    type = SelectField('Tipe Dokumen', choices=[
+        ('Sertifikat Prestasi', 'Sertifikat Prestasi'),
+        ('Sertifikat Hafalan', 'Sertifikat Hafalan'),
+    ], validators=[DataRequired()])
+    issued_date = DateField('Tanggal Diterbitkan', validators=[DataRequired()])
+    note = TextAreaField('Keterangan', validators=[DataRequired()], render_kw={'rows': 5})
