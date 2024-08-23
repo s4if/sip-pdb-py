@@ -15,10 +15,9 @@ class Registrant(db.Model):
     __tablename__ = 'registrants'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(15), nullable=False, unique=True)
-    reg_id = db.Column(db.String(15), nullable=True, unique=True)
+    reg_id = db.Column(db.String(15), nullable=False) # reg_id dibuat ulang tiap edit profil utama
     password = db.Column(db.String, nullable=False)
     name = db.Column(db.String(60), nullable=False)
-    upload_dir = db.Column(db.String, nullable=True)
     gender = db.Column(db.String(10), nullable=False)
     prev_school = db.Column(db.String(120), nullable=False)
     nisn = db.Column(db.String(10), nullable=False)
@@ -26,17 +25,17 @@ class Registrant(db.Model):
     program = db.Column(db.String(15), nullable=False)
     selection_path = db.Column(db.String(40), nullable=False)
     entry_year = db.Column(db.Integer, nullable=False)
-    verified = db.Column(db.Boolean, nullable=False, default=False)
     finalized = db.Column(db.Boolean, nullable=False, default=False)
     reg_fee = db.Column(db.BigInteger, nullable=False, default=0) # biaya pendaftaran (registration fee)
     reg_payment_date = db.Column(db.Date, nullable=True)
+    verified_status = db.Column(db.Integer, nullable=False, default=0) # 0 -> unverified, 1 -> verified, -1 -> rejected
     deleted = db.Column(db.Boolean, nullable=False, default=False)
     gelombang = db.Column(db.Integer, nullable=False)
     registration_time = db.Column(db.DateTime, nullable=False)
-    initial_cost = db.Column(db.BigInteger, nullable=True)
-    monthly_cost = db.Column(db.BigInteger, nullable=True)
-    land_donation = db.Column(db.BigInteger, nullable=True)
-    buy_laptop = db.Column(db.Boolean, nullable=False, default=True)
+    initial_cost = db.Column(db.BigInteger, nullable=False, default=0)
+    monthly_cost = db.Column(db.BigInteger, nullable=False, default=0)
+    land_donation = db.Column(db.BigInteger, nullable=False, default=0)
+    buy_laptop = db.Column(db.Boolean, nullable=False, default=True) #not used for now
     main_parent = db.Column(db.String(8), nullable=False, default='father') # nanti dijadikan not null, default = 'father'
     qurban = db.Column(db.String(60), nullable=True)
     registrant_data_id = db.Column(db.Integer, db.ForeignKey('registrant_data.id'), nullable=True)
@@ -78,7 +77,6 @@ class RegistrantData(db.Model):
     head_size = db.Column(db.Integer, nullable=False)
     stay_with = db.Column(db.String, nullable=False)  # tinggal dengan siapa
     hobbies = db.Column(db.String(1024), nullable=True)
-    achievements = db.Column(db.String(1024), nullable=True)
     hospital_sheets = db.Column(db.String(1024), nullable=True)
     physical_abnormalities = db.Column(db.String(1024), nullable=True)
     
@@ -94,14 +92,14 @@ class Parent(db.Model):
     status = db.Column(db.String(25), nullable=False)  # Hidup, Cerai, Almarhum
     birth_place = db.Column(db.String(60), nullable=False)
     birth_date = db.Column(db.Date, nullable=False)
-    street = db.Column(db.String)  # Dusun
-    rt = db.Column(db.Integer)  # RT
-    rw = db.Column(db.Integer)  # RW
+    street = db.Column(db.String, nullable=False)  # Dusun
+    rt = db.Column(db.Integer, nullable=True)  # RT
+    rw = db.Column(db.Integer, nullable=True)  # RW
     village = db.Column(db.String, nullable=False)  # Desa
     district = db.Column(db.String, nullable=False)  # Kecamatan
     city = db.Column(db.String, nullable=False)  # Kota
     province = db.Column(db.String, nullable=False)
-    country = db.Column(db.String)
+    country = db.Column(db.String, nullable=False)
     postal_code = db.Column(db.Integer, nullable=False)
     contact = db.Column(db.String(18), nullable=False)  # Nomor Telepon
     relation = db.Column(db.String, nullable=False)  # Kandung, Tiri, Angkat
@@ -109,8 +107,8 @@ class Parent(db.Model):
     religion = db.Column(db.String, nullable=False)  # pake radio
     education_level = db.Column(db.String, nullable=False)  # tingkat pendidikan, sd, smp.. s3
     job = db.Column(db.String, nullable=False)
-    position = db.Column(db.String)
-    company = db.Column(db.String)
+    position = db.Column(db.String, nullable=True)
+    company = db.Column(db.String, nullable=True)
     income = db.Column(db.BigInteger, nullable=False, default=0)
     burden_count = db.Column(db.Integer, nullable=False, default=0)
     
