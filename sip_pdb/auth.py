@@ -1,6 +1,7 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
+from .config import PDB_CONFIG
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
 from .db import db
@@ -45,6 +46,11 @@ def register():
         error="Mohon maaf, SMKIT Ihsanul Fikri Saat ini hanya menerima peserta didik <strong>Putra</strong> saja."
         return render_template('login/register.jinja', form = form, error=error, cap_img=cap_img)
     
+    if request.form['selection_path'] != 'Jalur Reguler' and request.form['program'] == 'Industri':
+        cap_img = create_captcha()
+        error="Mohon maaf, Pendaftar jalur seleksi Non-Reguler tidak bisa memilih Kelas Industri."
+        return render_template('login/register.jinja', form = form, error=error, cap_img=cap_img)
+    
     # TODO: buka dokumentasi kemudian sempurnakan dengan hash yang lebih aman
     hashed_password = generate_password_hash(request.form['password'], method='pbkdf2:sha256', salt_length=16) 
     from .models import Registrant
@@ -58,8 +64,8 @@ def register():
     r.cp = request.form['cp']
     r.program = request.form['program']
     r.selection_path = request.form['selection_path']
-    r.entry_year = 2024 # sementara
-    r.gelombang = 1
+    r.entry_year = PDB_CONFIG['entry_year']
+    r.gelombang = PDB_CONFIG['indeks_gelombang']
     r.registration_time = db.func.current_timestamp()
 
     # commit ke database

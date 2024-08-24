@@ -11,12 +11,6 @@ bp = Blueprint('registrant', __name__, url_prefix='/pendaftar')
 
 # TODO: Implementasi blok belum-bayar per rute
 # saat ini mainkan menu saja
-# TODO: Halaman Upload Sertifikat Prestasi dan Hafalan
-'''
-Skema Model: id, tgl_terbit, keterangan
-User suruh buat keterangan sendiri?
-'''
-
 
 @bp.route('/')
 @login_required
@@ -648,3 +642,42 @@ def generate_hash():
     hash_object = hashlib.md5(str(timestamp).encode())
     hash_hex = hash_object.hexdigest()[:8]  # use first 8 characters of the hash
     return hash_hex
+
+@bp.route('/download/kartu_pendaftaran', methods=['GET'])
+@login_required
+def download_kartu_pendaftaran():
+    from .models import Registrant, RegistrantData, Parent
+    from .config import basedir, uploaddir
+    from flask_weasyprint import HTML, render_pdf
+    import base64
+    rg = Registrant.query.filter_by(id=session['user_id']).first()
+    
+    rgd = RegistrantData.query.filter_by(id=session['user_id']).first()
+    parent_data = {}
+    fd = Parent.query.filter_by(id=str(session['user_id'])+'_ayah').first()
+    if fd: 
+        if fd.birth_date : parent_data['Ayah'] = fd
+    md = Parent.query.filter_by(id=str(session['user_id'])+'_ibu').first()
+    if md: 
+        if md.birth_date : parent_data['Ibu'] = md
+    wd = Parent.query.filter_by(id=str(session['user_id'])+'_wali').first()
+    if wd: 
+        if wd.birth_date : parent_data['Wali'] = wd
+    
+    bg_path = os.path.join(basedir, 'static', 'img', 'logo_smk.png')
+    with open(bg_path, 'rb') as f:
+        bg_data = f.read()
+    bg_img = base64.b64encode(bg_data).decode('utf-8')
+    
+    datadir = os.path.join(uploaddir, str(session['username']))
+    foto_path = os.path.join(datadir, f'{session["user_id"]}_foto.png')
+    with open(foto_path, 'rb') as f:
+        foto_data = f.read()
+    foto_img = base64.b64encode(foto_data).decode('utf-8')
+    str_isi = render_template('registrant/kartu_pendaftaran.jinja',
+                           bg_img=bg_img,
+                           foto_img=f"data:image/png;base64,{foto_img}",
+                           rg=rg,
+                           rgd=rgd, 
+                           pd=parent_data)
+    return render_pdf(HTML(string=str_isi))

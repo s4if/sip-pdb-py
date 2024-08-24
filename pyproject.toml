@@ -17,6 +17,8 @@ flask-wtf = "^1.2.1"
 phonenumbers = "^8.13.38"
 captcha = "^0.5.0"
 flask-htmx = "^0.3.2"
+pdfkit = "^1.0.0"
+flask-weasyprint = "^1.1.0"
 
 
 [build-system]

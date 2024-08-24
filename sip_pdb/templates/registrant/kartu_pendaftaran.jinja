@@ -1,0 +1,297 @@
+{% from 'macros.jinja' import format_idr %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Data PDF</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .container {
+        width: 15cm;
+        height: 7cm;
+        border: 1px solid #000;
+        display: flex;
+        align-items: center;
+        padding: 0px;
+        box-sizing: border-box;
+        background-size: cover;
+        background-image: url("{{url_for('static', filename='img/bg_smk.png')}}");
+    }
+
+    table, td, tr, h2, p {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    table {
+        table-layout: auto;
+    }
+
+    .td-photo {
+        width: 1px;
+        white-space: nowrap;
+    }
+
+    .td-other {
+        width: 100%;
+    }
+
+    .photo img {
+        width: 3cm;
+        height: 4cm;
+        object-fit: cover;
+        margin-right: 5mm;
+        margin-left: 1cm;
+    }
+
+    .user-data p {
+        margin: 0px;
+        padding: 0px;
+        line-height: 1.5;
+        text-align: left;
+    }
+
+    .page-break {
+        page-break-after: always;
+    }
+    
+    .text-center {
+        text-align: center;
+        border: 0px;
+        padding: 0px;
+    }
+
+    .w100 {
+        width: 100%;
+    }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <table class="w100">
+        <tr>
+        <td colspan="2" class="w100"><h2 class="text-center">Kartu Pendaftaran PPDB</h2></td>
+        </tr>
+        <tr>
+        <td colspan="2" class="w100"><p class="text-center">SMKIT Ihsanul Fikri Mungkid</p></td>
+        </tr>
+        <tr>
+        <td class="td-photo">
+        <div class="photo">
+            <img src="{{ foto_img }}" alt="User Photo">
+        </div>
+        </td>
+        <td class="td-other">
+            <table>
+            <tr><td>Nomor Pendaftaran</td><td>&nbsp;:&nbsp;</td><td>{{rg.reg_id}}</td></tr>
+            <tr><td>Nama</td><td>&nbsp;:&nbsp;</td><td>{{rg.name}}</td></tr>
+            <tr><td>Sekolah Asal</td><td>&nbsp;:&nbsp;</td><td>{{rg.prev_school}}</td></tr>
+            <tr><td>Jalur Seleksi</td><td>&nbsp;:&nbsp;</td><td>{{rg.selection_path}}</td></tr>
+            <tr><td>Pilihan Kelas</td><td>&nbsp;:&nbsp;</td><td>{{rg.program}}</td></tr>
+            <tr><td>Gelombang</td><td>&nbsp;:&nbsp;</td><td>{{rg.gelombang}}</td></tr>
+            <tr><td>Tahun Pelajaran</td><td>&nbsp;:&nbsp;</td><td>{{rg.entry_year}} / {{rg.entry_year+1}}</td></tr>
+            </table>
+        </td>
+        </tr>
+        </table>
+    </div>
+    <div class="page-break">&nbsp;</div>
+
+<div class="row">
+    <div class="<col>">
+        <h4>Data Diri</h4>
+    </div>
+</div>
+<div class="row">
+    <div class="<col>">
+        <table>
+        <tr>
+            <td>Nama</td><td>&nbsp;:&nbsp;<td>{{rg.name}}</td>
+        </tr>
+        <tr>
+            <td>Gender</td><td>&nbsp;:&nbsp;<td>{{rg.gender}}</td>
+        </tr>
+        <tr>
+            <td>Asal Sekolah</td><td>&nbsp;:&nbsp;<td>{{rg.prev_school}}</td>
+        </tr>
+        <tr>
+            <td>NISN</td><td>&nbsp;:&nbsp;<td>{{rg.nisn}}</td>
+        </tr>
+        <tr>
+            <td>Kontak</td><td>&nbsp;:&nbsp;<td>{{rg.cp}}</td>
+        </tr>
+        <tr>
+            <td>Program Pilihan</td><td>&nbsp;:&nbsp;<td>{{rg.program}}</td>
+        </tr>
+        <tr>
+            <td>Jalur Masuk</td><td>&nbsp;:&nbsp;<td>{{rg.selection_path}}</td>
+        </tr>
+         <tr>
+            <td></td><td>&nbsp;</td><td></td>
+        </tr>
+        {%if rgd %}
+        <tr>
+            <td>No. Induk Keluarga</td><td>&nbsp;:&nbsp;<td>{{rgd.nik}}</td>
+        </tr>
+        <tr>
+            <td>No. Kartu Keluarga</td><td>&nbsp;:&nbsp;<td>{{rgd.nkk}}</td>
+        </tr>
+        <tr>
+            <td>No. Akte Kelahiran</td><td>&nbsp;:&nbsp;<td>{{rgd.nak}}</td>
+        </tr>
+        <tr>
+            <td>Tempat, Tgl Lahir</td><td>&nbsp;:&nbsp;<td>{{rgd.birth_place}}, {{rgd.birth_date | format_date}}</td>
+        </tr>
+        <tr>
+            <td>Anak ke</td><td>&nbsp;:&nbsp;<td>{{rgd.birth_order}} dari {{rgd.siblings_count}} bersaudara</td>
+        </tr>
+        <tr>
+            <td>Alamat</td><td>&nbsp;:&nbsp;
+            <td>
+                {{rgd.street}} RT {{rgd.rt}} RW {{rgd.rw}} {{rgd.village}} {{rgd.district}} 
+                {{rgd.city}} {{rgd.province}} {{rgd.country}}
+            </td>
+        </tr>
+        <tr>
+            <td>Kode Pos</td><td>&nbsp;:&nbsp;<td>{{rgd.postal_code}}</td>
+        </tr>
+        <tr>
+            <td>Status Orang Tua</td><td>&nbsp;:&nbsp;<td>{{rgd.parent_status}}</td>
+        </tr>
+        <tr>
+            <td>Tinggal Bersama</td><td>&nbsp;:&nbsp;<td>{{rgd.stay_with}}</td>
+        </tr>
+        <tr>
+            <td>Tinggi</td><td>&nbsp;:&nbsp;<td>{{rgd.height}} cm </td>
+        </tr>
+        <tr>
+            <td>Berat</td><td>&nbsp;:&nbsp;<td>{{rgd.weight}} Kg</td>
+        </tr>
+        <tr>
+            <td>Lingkar Kepala</td><td>&nbsp;:&nbsp;<td>{{rgd.head_size}} cm</td>
+        </tr>
+        <tr>
+            <td>Kewarganegaraan</td><td>&nbsp;:&nbsp;<td>{{rgd.nationality}}</td>
+        </tr>
+        <tr>
+            <td>Agama</td><td>&nbsp;:&nbsp;<td>{{rgd.religion}}</td>
+        </tr>
+        <!-- hobi dkk masih todo -->
+        {% endif %}
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="<col>">
+        <hr /> <!-- JANGAN GANTI -->
+    </div>
+</div>
+
+<div class="row">
+    <div class="<col>">
+        <h4>Data Pembayaran</h4>
+    </div>
+</div>
+<div class="row">
+    <div class="<col>">
+        <table>
+        <tr>
+            <td>Infaq Pendidikan</td><td>&nbsp;:&nbsp;<td>{{ format_idr(rg.initial_cost) if rg.initial_cost else "-" }}</td>
+        </tr>
+        <tr>
+            <td>SPP Bulanan</td><td>&nbsp;:&nbsp;<td>{{ format_idr(rg.monthly_cost) if rg.monthly_cost else "-" }}</td>
+        </tr>
+        <tr>
+            <td>Wakaf Tanah</td><td>&nbsp;:&nbsp;<td>{{ format_idr(rg.land_donation) if rg.land_donation else "-" }}</td>
+        </tr>
+        <tr>
+            <!-- TODO: Format dipercantik -->
+            <td>kesediaan Qurban di Sekolah</td><td>&nbsp;:&nbsp;<td>{{ rg.qurban }}</td>
+        </tr>
+        </table>
+    </div>
+</div>
+
+<div class="page-break">&nbsp;</div>
+
+{% for tipe, obj in pd.items() %}
+<div class="row">
+    <div class="<col>">
+        <h4>Data {{ tipe }}</h4>
+    </div>
+</div>
+<div class="row">
+    <div class="<col>">
+        <table>
+        <tr>
+            <td>Nama</td><td>&nbsp;:&nbsp;</td><td>{{obj.name}}</td>
+        </tr>
+        <tr>
+            <td>Status</td><td>&nbsp;:&nbsp;</td><td>{{obj.status}}</td>
+        </tr>
+        <tr>
+            <td>No. Induk Kependudukan</td><td>&nbsp;:&nbsp;</td><td>{{obj.nik}}</td>
+        </tr>
+        <tr>
+            <td>Tempat, Tgl Lahir</td><td>&nbsp;:&nbsp;</td><td>{{obj.birth_place}}, {{obj.birth_date | format_date}}</td>
+        </tr>
+        <tr>
+            <td>Alamat</td><td>&nbsp;:&nbsp;
+            <td>
+                {{obj.street}} RT {{obj.rt}} RW {{obj.rw}} {{obj.village}} {{obj.district}} 
+                {{obj.city}} {{obj.province}} {{obj.country}}
+            </td>
+        </tr>
+        <tr>
+            <td>Kode Pos</td><td>&nbsp;:&nbsp;</td><td>{{obj.postal_code}}</td>
+        </tr>
+        <tr>
+            <td>No. HP</td><td>&nbsp;:&nbsp;</td><td>{{obj.contact}}</td>
+        </tr>
+        <tr>
+            <td>Hub. Keluarga dengan Pendaftar</td><td>&nbsp;:&nbsp;</td><td>{{obj.relation}}</td>
+        </tr>
+        <tr>
+            <td>Kewarganegaraan</td><td>&nbsp;:&nbsp;</td><td>{{obj.nationality}}</td>
+        </tr>
+        <tr>
+            <td>Agama</td><td>&nbsp;:&nbsp;</td><td>{{obj.religion}}</td>
+        </tr>
+        <tr>
+            <td>Pendidikan Terakhir</td><td>&nbsp;:&nbsp;</td><td>{{obj.education_level}}</td>
+        </tr>
+        <tr>
+            <td>Pekerjaan</td><td>&nbsp;:&nbsp;</td><td>{{obj.job}}</td>
+        </tr>
+        <tr>
+            <td>Jabatan</td><td>&nbsp;:&nbsp;</td><td>{{obj.position}}</td>
+        </tr>
+        <tr>
+            <td>Instansi/Perusahaan</td><td>&nbsp;:&nbsp;</td><td>{{obj.company}}</td>
+        </tr>
+        <tr>
+            <td>Penghasilan Bulanan</td><td>&nbsp;:&nbsp;</td><td>{{format_idr(obj.income)}}</td>
+        </tr>
+        <tr>
+            <td>Jumlah Tanggungan</td><td>&nbsp;:&nbsp;</td><td>{{obj.burden_count}}</td>
+        </tr>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="<col>">
+        <hr />
+    </div>
+</div>
+{% endfor %}
+
+</body>
+</html>

@@ -165,6 +165,7 @@ class DocumentForm(FlaskForm):
     type = SelectField('Tipe Dokumen', choices=[
         ('Sertifikat Prestasi', 'Sertifikat Prestasi'),
         ('Sertifikat Hafalan', 'Sertifikat Hafalan'),
+        ('Surat Keterangan', 'Surat Keterangan')
     ], validators=[DataRequired()])
     issued_date = DateField('Tanggal Diterbitkan', validators=[DataRequired()])
     note = TextAreaField('Keterangan', validators=[DataRequired()], render_kw={'rows': 5})

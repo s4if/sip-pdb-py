@@ -24,4 +24,11 @@ def admin_required(view):
         return view(**kwargs)
     return wrapped_view
 
+# TODO: generate pdf!
+'''
+pake weasyprint
+css manual
+semua image dimasukkan pakai base64
+'''
+
 

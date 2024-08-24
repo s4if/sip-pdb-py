@@ -15,7 +15,7 @@ class Registrant(db.Model):
     __tablename__ = 'registrants'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(15), nullable=False, unique=True)
-    reg_id = db.Column(db.String(15), nullable=False) # reg_id dibuat ulang tiap edit profil utama
+    reg_id = db.Column(db.String(15), nullable=True) # reg_id dibuat saat finalisasi!
     password = db.Column(db.String, nullable=False)
     name = db.Column(db.String(60), nullable=False)
     gender = db.Column(db.String(10), nullable=False)
@@ -49,6 +49,12 @@ class Registrant(db.Model):
     
     def __repr__(self):
         return '<User {}>'.format(self.username)
+    
+    def set_reg_id(self): # dijalankan saat finalisasi
+        kode_jalur = "R" if self.selection_path == "Jalur Reguler" else "K"
+        kode_tahun = str(self.entry_year)[-2:]
+        kode_id = str(self.id).zfill(3)
+        self.reg_id = kode_jalur + kode_tahun + kode_id
     
 class RegistrantData(db.Model):
     __tablename__ = 'registrant_data'
