@@ -22,18 +22,45 @@
 <div class="row">
 <div class="<col>">
 <div > <!-- jumbotron sudah gak ada? -->
-    {% if reg_fee < 0 %}
+    {% if rg.verified_status < 0 %}
     <h1>Mohon maaf</h1>
     <p>
         Mohon maaf, bukti pembayaran yang anda upload salah atau tidak bisa terbaca. 
         Silahkan scan atau foto kembali kwitansi pembayaran anda dengan jelas lalu upload 
         dengan klik tombol di bawah.
     </p>
-    <a class="btn btn-warning" data-toggle="modal" data-target="#uploadKwitansi" id="btn-kwitansi" >
-        <span class="glyphicon glyphicon-upload"></span>
-        Upload Kwitansi
-    </a>
-    {% elif finalized %}
+    <div class="row">
+    <div class="col">
+    <div class="card border-primary">
+        <div class="card-header">
+            Form Upload 
+        </div>
+        <div class="card-body" hx-push-url="false" hx-boost="false">
+            <form accept="image/*" method="post"action="{{ url_for('registrant.upload_kwitansi') }}"
+                enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="mb-3">
+                    <label class="form-label">Jumlah Pembayaran</label>
+                    <input type="number" required name="jumlah" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tanggal Pembayaran</label>
+                    <input type="date" required name="tgl_bayar" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Upload Kwitansi</label>
+                    <input type="file" required name="file" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="card-footer">
+        &nbsp;
+        </div>
+    </div>
+    </div>
+    </div>
+    {% elif rg.finalized %}
     <h1>Selamat, anda telah menyelesaikan pendaftaran!</h1>
     <p>
         Terimakasih telah mendaftar di SMKIT Ihsanul Fikri.<br/>
@@ -44,7 +71,7 @@
     </p>        
     <a class="btn btn-primary" hx-boost="false" target="_blank" href="{{url_for('registrant.download_kartu_pendaftaran')}}">
         Unduh Kartu Dan Formulir Pendaftaran</a>
-    {% elif reg_fee == 0 %}
+    {% elif rg.reg_fee == 0 %}
     <h1>Selamat Datang di Sistem PPDB SMKIT Ihsanul Fikri Mungkid</h1>
     <p>
         Ini adalah sistem pendaftaran peserta didik baru (PPDB) SMKIT Ihsanul Fikri Mungkid.
@@ -72,15 +99,15 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="mb-3">
                     <label class="form-label">Jumlah Pembayaran</label>
-                    <input type="number" name="jumlah" class="form-control">
+                    <input type="number" required name="jumlah" class="form-control" placeholder="{{200000 + rg.id}}">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Tanggal Pembayaran</label>
-                    <input type="date" name="tgl_bayar" class="form-control">
+                    <input type="date" required name="tgl_bayar" class="form-control">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Upload Kwitansi</label>
-                    <input type="file" name="file" class="form-control">
+                    <input type="file" required name="file" class="form-control">
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>

@@ -21,8 +21,7 @@ def beranda():
                            username=session['username'], 
                            is_htmx=htmx,
                            show_menu=session['show_menu'],
-                           reg_fee=rg.reg_fee,
-                           finalized=rg.finalized,
+                           rg=rg,
                            p_code=str(rg.id).zfill(3)
                            )
 
@@ -451,9 +450,8 @@ def upload_kwitansi():
     
     rg = Registrant.query.filter_by(id=session['user_id']).first()    
     f = request.files['file']
-    jumlah = request.form['jumlah']
     tgl_bayar = request.form['tgl_bayar']
-    rg.reg_fee = jumlah
+    rg.reg_fee = int(request.form['jumlah'])
     rg.reg_payment_date = datetime.datetime.strptime(tgl_bayar, '%Y-%m-%d').date()
     db.session.add(rg)
     db.session.commit()
@@ -469,8 +467,7 @@ def upload_kwitansi():
                            username=session['username'], 
                            is_htmx=htmx,
                            show_menu=session['show_menu'],
-                           reg_fee=rg.reg_fee,
-                           finalized=rg.finalized,
+                           rg=rg,
                            p_code=str(rg.id).zfill(3),
                            error='File harus bertipe .jpg, .jpeg, atau .png'
                            ) 
@@ -482,8 +479,7 @@ def upload_kwitansi():
                            username=session['username'], 
                            is_htmx=htmx, 
                            show_menu=session['show_menu'],
-                           reg_fee=rg.reg_fee,
-                           finalized=rg.finalized,
+                           rg=rg,
                            p_code=str(rg.id).zfill(3),
                            success='Kwitansi Berhasil di Upload.'
                            )
@@ -499,8 +495,7 @@ def finalisasi():
                             username=session['username'], 
                             is_htmx=htmx,
                             show_menu=session['show_menu'],
-                            reg_fee=rg.reg_fee,
-                            finalized=rg.finalized,
+                            rg=rg,
                             p_code=str(rg.id).zfill(3),
                             error='Anda telah menyelesaikan pendaftaran.'
                             )
@@ -515,6 +510,7 @@ def finalisasi():
         
     if request.method == 'POST':
         rg.finalized = True
+        rg.set_reg_id()
         db.session.add(rg)
         db.session.commit()
         session['show_menu'] = False
@@ -522,8 +518,7 @@ def finalisasi():
                             username=session['username'], 
                             is_htmx=htmx, 
                             show_menu=session['show_menu'],
-                            reg_fee=rg.reg_fee,
-                            finalized=rg.finalized,
+                            rg=rg,
                             p_code=str(rg.id).zfill(3),
                             success='Anda telah menyelesaikan pendaftaran.'
                             )
@@ -680,4 +675,34 @@ def download_kartu_pendaftaran():
                            rg=rg,
                            rgd=rgd, 
                            pd=parent_data)
+    return render_pdf(HTML(string=str_isi))
+
+@bp.route('/download/surat_pernyataan', methods=['GET'])
+@login_required
+def download_surat_pernyataan():
+    from flask_weasyprint import HTML, render_pdf
+    from .models import Registrant, Parent
+    from .config import PDB_CONFIG
+    biaya_tetap = PDB_CONFIG['biaya_tetap']
+    tahun_masuk = PDB_CONFIG['tahun_masuk']
+    rg = Registrant.query.filter_by(id=session['user_id']).first()
+    dct_parent = {'father':'ayah', 'mother':'ibu', 'guardian':'wali'}
+    type = dct_parent[rg.main_parent]
+    parent = Parent.query.filter_by(id=str(session['user_id'])+'_'+type).first()
+    total = 0
+    for key in biaya_tetap.keys():
+        total += biaya_tetap[key]
+    
+    total = total + rg.initial_cost + rg.monthly_cost + rg.land_donation
+    now = datetime.datetime.now()
+    bulan = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
+    tanggal = f'{now.day} {bulan[now.month]} {now.year}'
+    
+    
+    str_isi = render_template('registrant/surat_pernyataan.jinja', 
+                              rg=rg, parent=parent,
+                              tahun_masuk=tahun_masuk,
+                              total=total,
+                              tanggal=tanggal,
+                              **biaya_tetap)
     return render_pdf(HTML(string=str_isi))

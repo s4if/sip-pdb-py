@@ -64,7 +64,7 @@ def register():
     r.cp = request.form['cp']
     r.program = request.form['program']
     r.selection_path = request.form['selection_path']
-    r.entry_year = PDB_CONFIG['entry_year']
+    r.entry_year = PDB_CONFIG['tahun_masuk'] 
     r.gelombang = PDB_CONFIG['indeks_gelombang']
     r.registration_time = db.func.current_timestamp()
 
@@ -98,7 +98,7 @@ def login():
             session['name'] = r.name
             session['logged_in'] = True
             session['is_admin'] = False
-            session['show_menu'] = r.reg_fee > 0 and not r.finalized # TODO: cek lagi logic-nya
+            session['show_menu'] = int(r.reg_fee) > 0 and not r.finalized # TODO: cek lagi logic-nya
             return redirect(url_for('registrant.beranda'))
         else:
             error = 'Invalid username or password'
