@@ -7,7 +7,9 @@
 {% block content %}
 <div class="row">
 	<div class="col">
-		<form method="POST" action="{{ url_for('auth.login') }}" hx-boost="false">
+		<form method="POST" 
+		action="{{ url_for('auth.login_admin') if is_admin else url_for('auth.login') }}" 
+		hx-boost="false">
 		  {{ form.csrf_token }}
 		  {{ render_field(form.username) }}
 		  {{ render_field(form.password) }}

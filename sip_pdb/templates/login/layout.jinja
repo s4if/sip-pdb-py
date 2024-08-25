@@ -11,6 +11,11 @@
             padding-top: 75px;
         }
     </style>
+    {%if datatables %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/datatables.min.css') }}">
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
+    {%endif%}
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/htmx.min.js') }}"></script>
 </head>
@@ -37,15 +42,15 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0"{%if datatables%} hx-boost="false" {%endif%}>
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('auth.login' )}}">Masuk</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('auth.register')}}">Daftar</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Lihat</a>
+        <li class="nav-item" hx-boost="false">
+          <a class="nav-link" href="{{ url_for('auth.lihat')}}">Lihat</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Petunjuk</a>

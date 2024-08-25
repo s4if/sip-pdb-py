@@ -10,8 +10,10 @@ htmx = HTMX()
 def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if 'logged_in' not in session or 'username' not in session:
+        if 'logged_in' not in session or 'user_id' not in session or 'username' not in session:
             # TODO: tambah pesan flash error
+            return redirect(url_for('auth.login'))
+        elif session['logged_in'] == False or not isinstance(session['user_id'], int):
             return redirect(url_for('auth.login'))
         return view(**kwargs)
     return wrapped_view

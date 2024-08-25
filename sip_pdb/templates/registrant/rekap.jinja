@@ -47,7 +47,10 @@
         <tr>
             <td>Jalur Masuk</td><td>&nbsp;:&nbsp;<td>{{rg.selection_path}}</td>
         </tr>
-         <tr>
+        <tr>
+            <td>Status Foto</td><td>&nbsp;:&nbsp;<td>{{'Sudah diunggah' if pu else 'Belum diunggah'}}</td>
+        </tr>
+        <tr>
             <td></td><td>&nbsp;</td><td></td>
         </tr>
         {%if rgd %}
@@ -212,9 +215,9 @@
     <div class="<col>">
         {% if rg.finalized %}
         <p>Jika ternyata masih terdapat kesalahan data setelah finalisasi, silahkan hubungi panitia.</p>
-        {% elif rgd and pd.Ayah and pd.Ibu  %}
+        {% elif rgd and pd.Ayah and pd.Ibu and pu  %}
         <a href="{{ url_for('registrant.finalisasi')}}" class="btn btn-warning text-decoration-none" role="button">
-            Finalisasi
+            Finalisasiand pu 
         </a>
         {% endif %}
     </div>

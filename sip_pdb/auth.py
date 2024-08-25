@@ -108,3 +108,28 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('auth.login'))
+
+# gak tau ini bener apa gak
+@bp.route('/lihat')
+def lihat():
+    return render_template('login/lihat.jinja', datatables=True)
+
+@bp.route('/login/admin', methods=['GET', 'POST'])
+def login_admin():
+    from .forms import LoginForm
+    form = LoginForm(request.form)
+    if request.method == 'GET':
+        # TODO: flash error dari login_required
+        return render_template('login/index.jinja', form=form, admin=True)
+    else:
+        from .models import Admin
+        a = Admin.query.filter_by(username=request.form['username']).first()
+        if a and check_password_hash(a.password, request.form['password']):
+            # remember which user has logged in
+            session['logged_in'] = True
+            session['is_admin'] = True
+            session['admin_name'] = a.username
+            return redirect(url_for('admin.beranda'))
+        else:
+            error = 'Invalid username or password'
+            return render_template('login/index.jinja', form=form, error=error, admin=True)

@@ -1,0 +1,31 @@
+{% extends "login/layout.jinja" %}
+
+{% block title %}Lihat Pendaftar{% endblock %}
+
+{% block content %}
+<div class="row">
+	<div class="col">
+		<table id="tabel_utama" class="table table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>No. Pendaftaran</th>
+                    <th>Nama</th>
+                    <th>Sekolah Asal</th>
+                    <th>Kelas Pilihan</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+	</div>
+</div>
+<script>
+// A $( document ).ready() block.
+$( document ).ready(function() {
+    new DataTable('#tabel_utama', {
+        ajax: "{{url_for('registrant.lihat_pendaftar')}}",
+        pageLength: 25
+    });
+});
+</script>
+{% endblock %}

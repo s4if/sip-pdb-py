@@ -1,6 +1,6 @@
 import datetime, os
 from flask import (
-    Blueprint, g, render_template, request, send_file, session, url_for, send_from_directory
+    Blueprint, g, jsonify, render_template, request, send_file, session, url_for, send_from_directory
 )
 from sqlalchemy.exc import IntegrityError
 from .db import db
@@ -432,6 +432,8 @@ def rekap():
     from .models import Registrant, RegistrantData, Parent
     rg = Registrant.query.filter_by(id=session['user_id']).first()
     rgd = RegistrantData.query.filter_by(id=session['user_id']).first()
+    datadir = os.path.join(uploaddir, session['username'])
+    pu = os.path.isfile(os.path.join(datadir, f'{session["user_id"]}_foto.png'))
     parent_data = {}
     fd = Parent.query.filter_by(id=str(session['user_id'])+'_ayah').first()
     if fd: 
@@ -446,6 +448,7 @@ def rekap():
                            is_htmx=htmx, 
                            show_menu=session['show_menu'],
                            rg=rg,
+                           pu=pu,
                            rgd=rgd, 
                            pd=parent_data)
 
@@ -770,3 +773,20 @@ def download_surat_pernyataan():
                               tanggal=tanggal,
                               **biaya_tetap)
     return render_pdf(HTML(string=str_isi))
+
+@bp.route('/lihat_pendaftar')
+def lihat_pendaftar():
+    from sqlalchemy.sql import text
+    # define the query using the db.session object
+    result = db.session.execute(text("""SELECT reg_id, name, prev_school, program 
+                                     FROM registrants where deleted=FALSE;
+                                     """))
+    # fetch the results
+    rows = result.fetchall()
+    data = []
+    for row in rows:
+        data.append(list(row))
+        
+    return jsonify({'data':data})
+    
+        
