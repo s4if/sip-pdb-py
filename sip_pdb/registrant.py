@@ -24,6 +24,70 @@ def beranda():
                            rg=rg,
                            p_code=str(rg.id).zfill(3)
                            )
+    
+@bp.route('/edit_profil', methods=('GET', 'POST'))
+@login_required
+def edit_profil():
+    from .forms import RegisterForm
+    from .models import Registrant
+    rg = Registrant.query.filter_by(id=session['user_id']).first()
+    if request.method == 'GET':
+        form = RegisterForm()
+        form.name.data = rg.name
+        form.prev_school.data = rg.prev_school
+        form.nisn.data = rg.nisn
+        form.cp.data = rg.cp
+        form.gender.data = rg.gender
+        form.selection_path.data = rg.selection_path
+        form.program.data = rg.program
+        return render_template('registrant/edit_profil.jinja', 
+                               username=session['username'], 
+                               form=form, 
+                               is_htmx=htmx,
+                               show_menu=session['show_menu'])
+    if request.method == 'POST':
+        form = RegisterForm(request.form)
+        if (form.name.validate(form) and
+                form.prev_school.validate(form) and
+                form.nisn.validate(form) and
+                form.cp.validate(form) and
+                form.selection_path.validate(form) and
+                form.program.validate(form)
+            ):
+            if request.form['selection_path'] != 'Jalur Reguler' and request.form['program'] == 'Industri':
+                error="Mohon maaf, Pendaftar jalur seleksi Non-Reguler tidak bisa memilih Kelas Industri."
+                return render_template('registrant/edit_profil.jinja', 
+                                   username=session['username'], 
+                                   form=form, 
+                                   is_htmx=htmx,
+                                   error=error,
+                                   show_menu=session['show_menu'])
+                
+            rg.name = form.name.data
+            rg.prev_school = form.prev_school.data
+            rg.nisn = form.nisn.data
+            rg.cp = form.cp.data
+            rg.selection_path = form.selection_path.data
+            rg.program = form.program.data
+            db.session.add(rg)
+            db.session.commit()
+            success = "Profil anda telah diperbarui"
+            return render_template('registrant/edit_profil.jinja', 
+                                   username=session['username'], 
+                                   form=form, 
+                                   is_htmx=htmx,
+                                   success=success,
+                                   show_menu=session['show_menu'])
+        else:
+            error = "Mohon maaf, terjadi kesalahan. Silahkan coba lagi."
+            return render_template('registrant/edit_profil.jinja', 
+                                   username=session['username'], 
+                                   form=form, 
+                                   is_htmx=htmx,
+                                   error=error,
+                                   show_menu=session['show_menu'])
+        
+    
 
 @bp.route('/isi_data', methods=('GET', 'POST'))
 @login_required

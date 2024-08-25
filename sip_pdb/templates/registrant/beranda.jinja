@@ -67,10 +67,12 @@
         <!-- Pendaftaran akan dilakukan dengan metode <em>Fast Service</em>, 
         silahkan hubungi whatsapp <strong>+62 857-2962-9508</strong> untuk keterangan lebih lanjut.-->
         Tes PPDB akan dilaksanakan pada tanggal 11 Februari 2024<br/>
-        Silahkan Unduh dan cetak formulir dan kartu pendaftaran.
+        Silahkan Unduh dan cetak formulir, kartu pendaftaran dan surat pernyataan.
     </p>        
     <a class="btn btn-primary" hx-boost="false" target="_blank" href="{{url_for('registrant.download_kartu_pendaftaran')}}">
         Unduh Kartu Dan Formulir Pendaftaran</a>
+    <a class="btn btn-warning" hx-boost="false" target="_blank" href="{{url_for('registrant.download_surat_pernyataan')}}">
+        Unduh Surat Pernyataan</a>
     {% elif rg.reg_fee == 0 %}
     <h1>Selamat Datang di Sistem PPDB SMKIT Ihsanul Fikri Mungkid</h1>
     <p>

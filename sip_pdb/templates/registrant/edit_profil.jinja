@@ -1,0 +1,47 @@
+{% if not is_htmx %}
+    {% extends "registrant/layout.jinja" %}
+    {% block title %}Edit Profil{% endblock %}
+{% else %}
+    <title>Edit Profil</title>
+{% endif %}
+
+{% from 'macros.jinja' import render_field, render_notif %}
+
+{% block content %}
+
+{{ render_notif(error, success, info) }}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('registrant.beranda') }}">Beranda</a></li>
+        <li class="breadcrumb-item active">Edit Profil</li>
+    </ol>
+</nav>
+<h1 class="h2">Edit Profil</h1>
+<p>Edit Profil Disini!</p>
+
+<div class="row">
+	<div class="col-12">
+		<form method="POST" action="{{ form_url }}">
+            {{ form.csrf_token }}
+            {{ render_field(form.name) }}
+            {{ render_field(form.prev_school) }}
+            {{ render_field(form.nisn) }}
+            {{ render_field(form.cp) }}
+            <div class="row mb-3">
+                <label class="col-md-2 col-sm-3 col-form-label">Jalur Seleksi</label>
+                <div class="col-md-8 col-sm-7">
+                    {{ form.selection_path(class="form-select") }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-md-2 col-sm-3 col-form-label">Kelas yang Dipilih</label>
+                <div class="col-md-8 col-sm-7">
+                    {{ form.program(class="form-select") }}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
