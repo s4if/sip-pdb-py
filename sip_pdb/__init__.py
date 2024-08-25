@@ -1,7 +1,7 @@
 import os, datetime
 
 from flask import Flask, session, redirect, url_for
-from . import auth, registrant
+from . import auth, registrant, admin
 from werkzeug.security import check_password_hash, generate_password_hash
 from .config import Config
 from flask_sqlalchemy import SQLAlchemy
@@ -99,6 +99,7 @@ def create_app(test_config=None):
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(registrant.bp)
+    app.register_blueprint(admin.bp)
     app.cli.add_command(add_admin_user)
     app.cli.add_command(delete_admin_user)
     app.cli.add_command(change_admin_user)

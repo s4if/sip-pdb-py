@@ -120,10 +120,11 @@ def login_admin():
     form = LoginForm(request.form)
     if request.method == 'GET':
         # TODO: flash error dari login_required
-        return render_template('login/index.jinja', form=form, admin=True)
+        return render_template('login/index.jinja', form=form, is_admin=True)
     else:
         from .models import Admin
         a = Admin.query.filter_by(username=request.form['username']).first()
+        print(a)
         if a and check_password_hash(a.password, request.form['password']):
             # remember which user has logged in
             session['logged_in'] = True
@@ -131,5 +132,5 @@ def login_admin():
             session['admin_name'] = a.username
             return redirect(url_for('admin.beranda'))
         else:
-            error = 'Invalid username or password'
-            return render_template('login/index.jinja', form=form, error=error, admin=True)
+            error = 'Invalid admin username or password'
+            return render_template('login/index.jinja', form=form, error=error, is_admin=True)

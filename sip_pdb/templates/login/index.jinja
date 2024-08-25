@@ -6,6 +6,11 @@
 
 {% block content %}
 <div class="row">
+<div class="col text-center">
+<h1>Login {{'Admin' if is_admin else 'Pendaftar'}}</h1>
+</div>
+</div>
+<div class="row">
 	<div class="col">
 		<form method="POST" 
 		action="{{ url_for('auth.login_admin') if is_admin else url_for('auth.login') }}" 
