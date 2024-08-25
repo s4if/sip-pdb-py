@@ -290,13 +290,13 @@ def isi_ortu(tipe):
         db.session.add(parent)
         db.session.commit()
         if tipe == 'ayah':
-            rg.ayah = parent
+            rg.father_id = parent.id
             prev_url = url_for('registrant.isi_ortu', tipe='ayah')
             next_url = url_for('registrant.isi_ortu', tipe='ibu')
             step = "Data Ayah"
             
         elif tipe == 'ibu':
-            rg.ibu = parent
+            rg.mother_id = parent.id
             prev_url = url_for('registrant.isi_ortu', tipe='ibu')
             next_url = url_for('registrant.isi_pernyataan')
             step = "Data Ibu"
@@ -304,7 +304,7 @@ def isi_ortu(tipe):
             opt_url_text = "Isi Data Wali (Bila Perlu)"
             
         elif tipe == 'wali':
-            rg.wali = parent
+            rg.guardian_id = parent.id
             prev_url = url_for('registrant.isi_ortu', tipe='wali')
             next_url = url_for('registrant.isi_pernyataan')
             step = "Data Wali"
