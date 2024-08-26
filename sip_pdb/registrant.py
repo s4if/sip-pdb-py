@@ -18,7 +18,8 @@ def beranda():
     from .models import Registrant
     rg = Registrant.query.filter_by(id=session['user_id']).first()
     return render_template('registrant/beranda.jinja', 
-                           username=session['username'], 
+                           username=session['username'],
+                           is_admin=session['is_admin'], 
                            is_htmx=htmx,
                            show_menu=session['show_menu'],
                            rg=rg,
@@ -42,6 +43,7 @@ def edit_profil():
         form.program.data = rg.program
         return render_template('registrant/edit_profil.jinja', 
                                username=session['username'], 
+                               is_admin=session['is_admin'], 
                                form=form, 
                                is_htmx=htmx,
                                show_menu=session['show_menu'])
@@ -58,6 +60,7 @@ def edit_profil():
                 error="Mohon maaf, Pendaftar jalur seleksi Non-Reguler tidak bisa memilih Kelas Industri."
                 return render_template('registrant/edit_profil.jinja', 
                                    username=session['username'], 
+                                   is_admin=session['is_admin'], 
                                    form=form, 
                                    is_htmx=htmx,
                                    error=error,
@@ -74,6 +77,7 @@ def edit_profil():
             success = "Profil anda telah diperbarui"
             return render_template('registrant/edit_profil.jinja', 
                                    username=session['username'], 
+                                   is_admin=session['is_admin'], 
                                    form=form, 
                                    is_htmx=htmx,
                                    success=success,
@@ -82,6 +86,7 @@ def edit_profil():
             error = "Mohon maaf, terjadi kesalahan. Silahkan coba lagi."
             return render_template('registrant/edit_profil.jinja', 
                                    username=session['username'], 
+                                   is_admin=session['is_admin'], 
                                    form=form, 
                                    is_htmx=htmx,
                                    error=error,
@@ -104,6 +109,7 @@ def isi_data():
         return render_template(
             'registrant/isi_data.jinja', 
             username=session['username'], 
+            is_admin=session['is_admin'], 
             form=form, 
             photo_uploaded=pu, 
             is_htmx=htmx,
@@ -114,6 +120,7 @@ def isi_data():
         error="Penyimpanan data gagal. Silahkan cek lagi data anda"
         return render_template('registrant/isi_data.jinja', 
                                 show_menu=session['show_menu'],
+                                is_admin=session['is_admin'], 
                                 username=session['username'], 
                                 form=form, error=error, 
                                 photo_uploaded=pu, 
@@ -159,6 +166,7 @@ def isi_data():
         return render_template(
             'registrant/notif.jinja', 
             username=session['username'],
+            is_admin=session['is_admin'], 
             step="Data Pendaftar",
             show_menu=session['show_menu'],
             next_url=url_for('registrant.isi_ortu', tipe='ayah'),
@@ -167,7 +175,8 @@ def isi_data():
         )
     except IntegrityError:
         error="Penyimpanan data gagal, ada data yang salah. Silahkan coba lagi"
-        return render_template('registrant/isi_data.jinja', show_menu=session['show_menu'], username=session['username'], error=error, photo_uploaded=pu, is_htmx=htmx)
+        return render_template('registrant/isi_data.jinja', show_menu=session['show_menu'], username=session['username'],
+                           is_admin=session['is_admin'],  error=error, photo_uploaded=pu, is_htmx=htmx)
     
 @bp.route('/clone_alamat', methods=['GET'])
 @login_required
@@ -233,6 +242,7 @@ def isi_ortu(tipe):
         return render_template(
             'registrant/isi_ortu.jinja', 
             username=session['username'], 
+            is_admin=session['is_admin'], 
             form=form,
             show_menu=session['show_menu'],
             form_url=url_for('registrant.isi_ortu', tipe=tipe),
@@ -248,6 +258,7 @@ def isi_ortu(tipe):
         return render_template(
             'registrant/isi_ortu.jinja', 
             username=session['username'], 
+            is_admin=session['is_admin'], 
             form=form,
             form_url=url_for('registrant.isi_ortu', tipe=tipe),
             tipe=tipe, 
@@ -314,6 +325,7 @@ def isi_ortu(tipe):
         return render_template(
             'registrant/notif.jinja', 
             username=session['username'],
+            is_admin=session['is_admin'], 
             step=step,
             show_menu=session['show_menu'],
             next_url=next_url,
@@ -328,6 +340,7 @@ def isi_ortu(tipe):
         return render_template(
             'registrant/isi_ortu.jinja', 
             username=session['username'], 
+            is_admin=session['is_admin'], 
             show_menu=session['show_menu'],
             form=form, 
             error=error, 
@@ -400,6 +413,7 @@ def isi_pernyataan():
             return render_template(
                 'registrant/notif.jinja', 
                 username=session['username'],
+                is_admin=session['is_admin'], 
                 step=step,
                 next_url=next_url,
                 prev_url=prev_url,
@@ -416,6 +430,7 @@ def isi_pernyataan():
     return render_template(
         'registrant/isi_pernyataan.jinja', 
         username=session['username'], 
+        is_admin=session['is_admin'], 
         is_htmx=htmx, 
         bpm=bpm,
         fv=fv,
@@ -445,6 +460,7 @@ def rekap():
     if wd: 
         if wd.birth_date : parent_data['Wali'] = wd
     return render_template('registrant/rekap.jinja', username=session['username'], 
+                           is_admin=session['is_admin'], 
                            is_htmx=htmx, 
                            show_menu=session['show_menu'],
                            rg=rg,
@@ -532,6 +548,7 @@ def upload_kwitansi():
     if ext.lower() not in allowed_exts:
         return render_template('registrant/beranda.jinja', 
                            username=session['username'], 
+                           is_admin=session['is_admin'], 
                            is_htmx=htmx,
                            show_menu=session['show_menu'],
                            rg=rg,
@@ -544,6 +561,7 @@ def upload_kwitansi():
     session['show_menu'] = not rg.finalized
     return render_template('registrant/beranda.jinja', 
                            username=session['username'], 
+                           is_admin=session['is_admin'], 
                            is_htmx=htmx, 
                            show_menu=session['show_menu'],
                            rg=rg,
@@ -560,6 +578,7 @@ def finalisasi():
         if rg.finalized:
             return render_template('registrant/beranda.jinja', 
                             username=session['username'], 
+                           is_admin=session['is_admin'], 
                             is_htmx=htmx,
                             show_menu=session['show_menu'],
                             rg=rg,
@@ -571,6 +590,7 @@ def finalisasi():
                 'registrant/finalisasi.jinja',
                 show_menu=session['show_menu'],
                 username=session['username'], 
+                is_admin=session['is_admin'], 
                 is_htmx=htmx, 
                 )
         
@@ -583,6 +603,7 @@ def finalisasi():
         session['show_menu'] = False
         return render_template('registrant/beranda.jinja', 
                             username=session['username'], 
+                            is_admin=session['is_admin'], 
                             is_htmx=htmx, 
                             show_menu=session['show_menu'],
                             rg=rg,
@@ -605,6 +626,7 @@ def upload_dokumen():
             'registrant/laman_upload.jinja', 
             show_menu=session['show_menu'], 
             username=session['username'],
+            is_admin=session['is_admin'], 
             docs=docs,
             form=form,
             is_htmx=htmx
@@ -631,6 +653,7 @@ def upload_dokumen():
             return render_template(
                 'registrant/laman_upload.jinja', 
                 show_menu=session['show_menu'], 
+                is_admin=session['is_admin'], 
                 username=session['username'],
                 docs=docs,
                 form=form,
@@ -654,6 +677,7 @@ def upload_dokumen():
                 'registrant/laman_upload.jinja', 
                 show_menu=session['show_menu'], 
                 username=session['username'],
+                is_admin=session['is_admin'], 
                 docs=docs,
                 form=form,
                 error=error,
@@ -665,6 +689,7 @@ def upload_dokumen():
             'registrant/laman_upload.jinja', 
             show_menu=session['show_menu'], 
             username=session['username'],
+            is_admin=session['is_admin'], 
             docs=docs,
             form=form,
             success=success,
@@ -689,7 +714,8 @@ def delete_document(filename):
     docs = Document.query.filter_by(registrant_id=session['user_id']).all()
     return render_template(
             'registrant/laman_upload.jinja', 
-            show_menu=session['show_menu'], 
+            show_menu=session['show_menu'],
+            is_admin=session['is_admin'],  
             username=session['username'],
             docs=docs,
             form=form,
