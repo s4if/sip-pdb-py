@@ -23,7 +23,7 @@
 // A $( document ).ready() block.
 $( document ).ready(function() {
     new DataTable('#tabel_utama', {
-        ajax: "{{url_for('registrant.lihat_pendaftar')}}",
+        ajax: "{{url_for('registrant.data_pendaftar')}}",
         pageLength: 25
     });
 });

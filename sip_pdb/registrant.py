@@ -774,8 +774,8 @@ def download_surat_pernyataan():
                               **biaya_tetap)
     return render_pdf(HTML(string=str_isi))
 
-@bp.route('/lihat_pendaftar')
-def lihat_pendaftar():
+@bp.route('/data_pendaftar')
+def data_pendaftar():
     from sqlalchemy.sql import text
     # define the query using the db.session object
     result = db.session.execute(text("""SELECT reg_id, name, prev_school, program 
@@ -785,7 +785,7 @@ def lihat_pendaftar():
     rows = result.fetchall()
     data = []
     for row in rows:
-        data.append(list(row))
+        data.append(tuple(row))
         
     return jsonify({'data':data})
     
