@@ -6,6 +6,7 @@
     <meta name="description" content="The small framework with powerful features">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <style type="text/css">
         .sidebar {
             position: fixed;
@@ -43,8 +44,10 @@
             color: #0d6efd;
         }
     </style>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/htmx.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
 </head>
 <body hx-boost="true" hx-push-url="true">
 
@@ -79,21 +82,21 @@
                     >
                         <li class="nav-item">
                           <a class="nav-link"
-                            hx-get="{{ url_for('registrant.beranda') }}"
+                            hx-get="{{ url_for('admin.beranda') }}"
                           >
                             <span class="ml-2">Beranda</span>
                           </a>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link"
-                            hx-get="{{ url_for('registrant.beranda') }}"
+                            hx-get="{{ url_for('admin.lihat_pendaftar') }}"
                           >
                             <span class="ml-2">Lihat Pendaftar</span>
                           </a>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link"
-                            hx-get="{{ url_for('registrant.beranda') }}"
+                            hx-get="{{ url_for('admin.beranda') }}"
                           >
                             <span class="ml-2">Lihat Pembayaran</span>
                           </a>
