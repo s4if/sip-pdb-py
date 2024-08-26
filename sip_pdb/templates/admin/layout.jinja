@@ -49,7 +49,8 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/htmx.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
 </head>
-<body hx-boost="true" hx-push-url="true">
+{# hx-boost di nonaktifkan untuk mengejar kesimpel-an di panel admin #}
+<body hx-boost="false" hx-push-url="true">
 
 <nav class="navbar navbar-dark bg-dark p-3">
         <div class="d-flex col-12 col-md-3 col-lg-2 mb-2 mb-lg-0 flex-wrap flex-md-nowrap justify-content-between">
@@ -63,7 +64,7 @@
         <div class="col-12 col-md-5 col-lg-8 d-flex align-items-center justify-content-md-end mt-3 mt-md-0">
             <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                  Halo, {{ admin_name }}
+                  ADMINISTRATOR: {{ admin_name }}
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                   <li><a class="dropdown-item" href="#">Ganti Password</a></li>

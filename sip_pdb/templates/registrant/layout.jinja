@@ -60,7 +60,7 @@
         <div class="col-12 col-md-5 col-lg-8 d-flex align-items-center justify-content-md-end mt-3 mt-md-0">
             <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                  Halo, {{ username }}
+                  PENDAFTAR: {{ username }}
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                   <li><a class="dropdown-item" href="#">Ganti Password</a></li>
@@ -125,6 +125,29 @@
                 </div>
             </nav>
             <main class="col-xl-10 col-lg-9 col-md-9 col-12 fix-padding">
+              {% if is_admin %}
+              <div class="row justify-content-start">
+                <div class="col">
+                    <div class="card border-danger">
+                    <div class="card-header">
+                        Panel Admin
+                    </div>
+                    <div class="card-body" hx-boost="false">
+                        <a href="{{url_for('admin.back_to_admin')}}" class="btn btn-primary">Kembali ke role Admin</a>
+                        <a href="{{url_for('admin.revert_finalization', username=username)}}" class="btn btn-warning"
+                          hx-confirm="Apakah anda yakin melakukan undo finalisasi pada user ini?">
+                          Undo Finalisasi
+                        </a>
+                    </div>
+                    </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                &nbsp;
+                </div>
+              </div>
+              {% endif %}
               <div class="row" hx-target="#hx_content" hx-swap="innerHTML">
                 <div class="col" id="hx_content">
                 {% block content %} {% endblock %}

@@ -1,6 +1,6 @@
 import datetime, os
 from flask import (
-    Blueprint, g, jsonify, render_template, request, send_file, session, url_for, send_from_directory
+    Blueprint, g, jsonify, render_template, request, session, url_for, redirect
 )
 from sqlalchemy.exc import IntegrityError
 from .db import db
@@ -25,7 +25,7 @@ route admin/back_to_admin/
 @bp.route('/lihat_pendaftar', methods=['GET'])
 @admin_required
 def lihat_pendaftar():
-    return render_template('admin/lihat_pendaftar.jinja', is_htmx=htmx)
+    return render_template('admin/lihat_pendaftar.jinja', admin_name=session['admin_name'], is_htmx=htmx)
 
 @bp.route('/data_pendaftar', methods=['GET'])
 @admin_required
@@ -58,10 +58,45 @@ def data_pendaftar():
         item.append(row.program)
         item.append(row.father_income)
         item.append(row.mother_income)
-        item.append("""<button class="btn btn-sm btn-primary" hx-get="#">Edit</button>
-                    <button class="btn btn-sm btn-danger" hx-get="#">Delete</button>""")
+        # sementara langsung seperti ini
+        item.append("""<a class="btn btn-sm btn-primary" hx-boost="false" 
+                    href="{}">Lihat</a>
+                    <a class="btn btn-sm btn-danger" hx-get="#">Delete</a>
+                    """.format(url_for('admin.log_as_registrant', user_id=row.id)))
         data.append(item)
         
     return jsonify({'data':data})
 
-# TODO: Masuk dan keluar ke akun pendaftar!
+@bp.route('/log_as_registrant/<int:user_id>', methods=['GET'])
+@admin_required
+def log_as_registrant(user_id):
+    from .models import Registrant
+    rg = Registrant.query.filter_by(id=user_id).first()
+    if rg is None:
+        return redirect(url_for('admin.beranda'))
+    
+    session['user_id'] = user_id
+    session['username'] = rg.username
+    session['show_menu'] = True
+    return redirect(url_for('registrant.rekap'))
+
+@bp.route('/back_to_admin', methods=['GET'])
+@admin_required
+def back_to_admin():
+    session.pop('user_id', None)
+    session.pop('username', None)
+    session.pop('show_menu', None)
+    return redirect(url_for('admin.lihat_pendaftar'))
+
+@bp.route('/revert_finalization/<string:username>', methods=['GET'])
+@admin_required
+def revert_finalization(username):
+    from .models import Registrant
+    rg = Registrant.query.filter_by(username=username).first()
+    if rg is None:
+        return redirect(url_for('registrant.beranda'))
+    
+    rg.finalized = False
+    db.session.add(rg)
+    db.session.commit()
+    return redirect(url_for('registrant.beranda'))
