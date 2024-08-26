@@ -1,0 +1,67 @@
+{% if not is_htmx %}
+    {% extends "admin/layout.jinja" %}
+    {% block title %}Verifikasi Pembayaran{% endblock %}
+{% else %}
+    <title>Verifikasi Pembayaran</title>
+{% endif %}
+
+{% from 'macros.jinja' import render_notif, format_idr%}
+
+{% block content %}
+
+{{ render_notif(error, success, info) }}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.beranda') }}">Beranda</a></li>
+        <li class="breadcrumb-item active">Verifikasi Pembayaran</li>
+    </ol>
+</nav>
+<h1 class="h2">Verifikasi Pembayaran</h1>
+
+<div class="row">
+<div class="col">
+<div class="card border-primary" style="width:90%">
+    <div class="card-header">Form Verifikasi Pembayaran</div>
+    <div class="card-body">
+        <div class="container-fluid">
+        <div class="row">
+        <div class="col">
+        <img src="{{str_img}}" class="img-responsive" alt="gambar belum ada">
+        </div>
+        </div>
+        <hr>
+        <div class="row">
+        <div class="col">
+        <table>
+        <tr><td colspan="3">Data Pembayaran</td></tr>
+        <tr><td>Jumlah Pembayaran</td><td>&nbsp;:&nbsp;</td><td>{{format_idr(rg.reg_fee)}}</td></tr>
+        <tr><td>Tanggal Pembayaran</td><td>&nbsp;:&nbsp;</td><td>{{rg.reg_payment_date}}</td></tr>
+        </table>
+        </div>
+        </div>
+        <hr>
+        <form method="post", action="{{url_for('admin.verifikasi_pembayaran', user_id=user_id)}}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="row">
+        <div class="col">
+            <label for="main_parent" class="form-label">Hasil Verifikasi :</label>
+            <select class="form-select" id="main_parent" name="hasil_verifikasi">
+                <option value="-1">Nota yang diunggah tidak valid</option>
+                <option value="0">Belum diverifikasi</option>
+                <option value="1">Verifkasi Berhasil</option>
+            </select>
+        </div>
+        </div>
+        <div class="row">
+        <div class="col">
+            <button type="submit" class="btn btn-primary">OK</button>
+        </div>
+        </div>
+        </form>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{% endblock %}

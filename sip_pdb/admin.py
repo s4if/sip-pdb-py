@@ -67,6 +67,32 @@ def data_pendaftar():
         
     return jsonify({'data':data})
 
+@bp.route('/lihat_pembayaran', methods=['GET'])
+@admin_required
+def lihat_pembayaran():
+    return render_template('admin/lihat_pembayaran.jinja', admin_name=session['admin_name'], is_htmx=htmx)
+
+@bp.route('/data_pembayaran', methods=['GET'])
+@admin_required
+def data_pembayaran():
+    from .models import Registrant
+    rgs = Registrant.query.filter_by(deleted=False).all()
+    data = []
+    for row in rgs:
+        item = []
+        item.append(str(row.id).zfill(3))
+        item.append(row.name)
+        item.append(row.reg_fee)
+        item.append("Belum Bayar" if row.reg_payment_date is None else row.reg_payment_date.strftime('%a, %d %B %Y'))
+        status_str = ['Bukti Pembayaran Tidak Valid', 'Belum di verifikasi', 'Bukti Pembayaran Berhasil Diverifikasi']
+        item.append(status_str[row.verified_status+1]) #disesuaikan dengan tema -1, 0, 1
+        item.append("""<a class="btn btn-sm btn-primary" hx-boost="false" 
+                    href="{}">Verifikasi</a>
+                    """.format(url_for('admin.verifikasi_pembayaran', user_id=row.id)) if row.reg_fee > 0 else "")
+        data.append(item)
+    
+    return jsonify({'data':data})
+
 @bp.route('/log_as_registrant/<int:user_id>', methods=['GET'])
 @admin_required
 def log_as_registrant(user_id):
@@ -100,3 +126,38 @@ def revert_finalization(username):
     db.session.add(rg)
     db.session.commit()
     return redirect(url_for('registrant.beranda'))
+
+@bp.route('/verifikasi_pembayaran/<int:user_id>', methods=['GET', 'POST'])
+@admin_required
+def verifikasi_pembayaran(user_id):
+    from .models import Registrant
+    import base64
+    rg = Registrant.query.filter_by(id=user_id).first()
+    if rg is None:
+        return redirect(url_for('admin.beranda'))
+    
+    if request.method == 'GET':
+        datadir = os.path.join(uploaddir, str(rg.username))
+        filepath = os.path.join(datadir, f'{rg.id}_kwitansi.png')
+
+        # Check if the file exists and is a file (not a directory)
+        str_img = ''
+        if os.path.isfile(filepath) and not os.path.isdir(filepath):
+            with open(filepath, 'rb') as f:
+                raw_img = base64.b64encode(f.read()).decode('utf-8')
+                str_img = f"data:image/png;base64,{raw_img}"
+            
+        return render_template(
+            'admin/verifikasi_pembayaran.jinja', 
+            admin_name=session['admin_name'], 
+            is_htmx=htmx,
+            str_img=str_img,
+            rg=rg,
+            user_id=user_id
+        )
+    
+    if request.method == 'POST':
+        rg.verified_status = request.form['hasil_verifikasi']
+        db.session.add(rg)
+        db.session.commit()
+        return redirect(url_for('admin.lihat_pembayaran'))

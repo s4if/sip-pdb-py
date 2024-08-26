@@ -21,17 +21,14 @@
 
 <div class="row">
 <div class="col">
-<table id="tabel_utama" class="table table-striped table-sm" style="width:100%">
+<table id="tabel_utama" class="table table-striped table-sm" style="width:90%">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>No. Pendaftaran</th>
+            <th>Kode Bayar</th>
             <th>Nama</th>
-            <th>Sekolah Asal</th>
-            <th>Jalur Seleksi</th>
-            <th>Kelas Pilihan</th>
-            <th>Penghasilan Ayah</th>
-            <th>Penghasilan Ibu</th>
+            <th>Jumlah Pembayaran</th>
+            <th>Tanggal Bayar</th>
+            <th>Status Verifikasi</th>
             <th>Aksi</th>
         </tr>
     </thead>
@@ -43,7 +40,7 @@
 <script>
 $( document ).ready(function() {
     new DataTable('#tabel_utama', {
-        ajax: "{{url_for('admin.data_pendaftar')}}",
+        ajax: "{{url_for('admin.data_pembayaran')}}",
         pageLength: 25
     });
 });
