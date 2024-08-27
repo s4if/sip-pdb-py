@@ -353,6 +353,46 @@ def isi_ortu(tipe):
             is_htmx=htmx
             )
         
+def offset_bpm(bpm):
+    from .models import Registrant
+    offset = {
+        'Jalur Reguler': {
+                'infaq_pendidikan': 1, #tidak ada potongan
+                'spp': 1, #tidak ada potongan
+                'wakaf_tanah': 1 #tidak ada potongan
+            },
+        'Jalur Beasiswa Dhuafa': {
+                'infaq_pendidikan': 0.5, #potongan 50%
+                'spp': 0.8, #potongan 20%
+                'wakaf_tanah': 1 #tidak ada potongan
+            },
+        'Jalur Beasiswa Prestasi Nasional': {
+                'infaq_pendidikan': 0, #potongan 100%
+                'spp': 0.6, #potongan 40%
+                'wakaf_tanah': 1 #tidak ada potongan
+            },
+        'Jalur Beasiswa Prestasi Provinsi': {
+                'infaq_pendidikan': 0.8, #potongan 20%
+                'spp': 0.8, #potongan 20%
+                'wakaf_tanah': 1 #tidak ada potongan
+            },
+        'Jalur Beasiswa Tahfidz 10 Juz': {
+                'infaq_pendidikan': 0.8, #potongan 20%
+                'spp': 0.8, #potongan 20%
+                'wakaf_tanah': 1 #tidak ada potongan
+            },
+        'Jalur Beasiswa Tahfidz 20 Juz': {
+                'infaq_pendidikan': 0.6, #potongan 40%
+                'spp': 0.7, #potongan 30%
+                'wakaf_tanah': 1 #tidak ada potongan
+            },
+    }
+    data = {}
+    rg = Registrant.query.filter_by(id=session['user_id']).first()
+    for k, v in bpm.items():
+        data[k] = int(v * offset[rg.selection_path][k])
+    return data
+        
 @bp.route('/isi_pernyataan', methods=('GET', 'POST'))
 @login_required
 def isi_pernyataan():
@@ -361,7 +401,7 @@ def isi_pernyataan():
     from .models import Registrant
     biaya_tetap = PDB_CONFIG['biaya_tetap']
     tahun_masuk = PDB_CONFIG['tahun_masuk']
-    bpm=PDB_CONFIG['biaya_pendidikan_minimal'] # bpm -> biaya pendidikan minimal
+    bpm = offset_bpm(PDB_CONFIG['biaya_pendidikan_minimal']) # bpm -> biaya pendidikan minimal
     fv = { # fv -> Form Value
         'icost' : 0,
         'scost' : 0,
