@@ -1,6 +1,6 @@
 import datetime, os
 from flask import (
-    Blueprint, g, jsonify, render_template, request, session, url_for, redirect
+    Blueprint, g, jsonify, render_template, request, session, url_for, redirect, flash, get_flashed_messages
 )
 from sqlalchemy.exc import IntegrityError
 from .db import db
@@ -12,7 +12,17 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @bp.route('/')
 @admin_required
 def beranda():
-    return render_template('admin/beranda.jinja', admin_name=session['admin_name'], is_htmx=htmx)
+    notif = {}
+    fl_msg = get_flashed_messages(with_categories=True)
+    for category, message in fl_msg:
+        notif[category] = message
+    
+    return render_template(
+        'admin/beranda.jinja', 
+        admin_name=session['admin_name'], 
+        is_htmx=htmx,
+        **notif
+)
 
 # TODO: Implement login sebagai pendaftar dengan memainkan isi session
 '''
@@ -25,7 +35,12 @@ route admin/back_to_admin/
 @bp.route('/lihat_pendaftar', methods=['GET'])
 @admin_required
 def lihat_pendaftar():
-    return render_template('admin/lihat_pendaftar.jinja', admin_name=session['admin_name'], is_htmx=htmx)
+    notif = {}
+    fl_msg = get_flashed_messages(with_categories=True)
+    for category, message in fl_msg:
+        notif[category] = message
+        
+    return render_template('admin/lihat_pendaftar.jinja', admin_name=session['admin_name'], is_htmx=htmx, **notif)
 
 @bp.route('/data_pendaftar', methods=['GET'])
 @admin_required
@@ -70,7 +85,12 @@ def data_pendaftar():
 @bp.route('/lihat_pembayaran', methods=['GET'])
 @admin_required
 def lihat_pembayaran():
-    return render_template('admin/lihat_pembayaran.jinja', admin_name=session['admin_name'], is_htmx=htmx)
+    notif = {}
+    fl_msg = get_flashed_messages(with_categories=True)
+    for category, message in fl_msg:
+        notif[category] = message
+        
+    return render_template('admin/lihat_pembayaran.jinja', admin_name=session['admin_name'], is_htmx=htmx, **notif)
 
 @bp.route('/data_pembayaran', methods=['GET'])
 @admin_required
@@ -99,11 +119,13 @@ def log_as_registrant(user_id):
     from .models import Registrant
     rg = Registrant.query.filter_by(id=user_id).first()
     if rg is None:
+        flash('Registrant tidak ditemukan', 'error')
         return redirect(url_for('admin.beranda'))
     
     session['user_id'] = user_id
     session['username'] = rg.username
     session['show_menu'] = True
+    flash('Login sebagai {} berhasil'.format(rg.name), 'success')
     return redirect(url_for('registrant.rekap'))
 
 @bp.route('/back_to_admin', methods=['GET'])
@@ -112,7 +134,8 @@ def back_to_admin():
     session.pop('user_id', None)
     session.pop('username', None)
     session.pop('show_menu', None)
-    return redirect(url_for('admin.lihat_pendaftar'))
+    flash('Kembali ke akun Admin', 'info')
+    return redirect(url_for('admin.beranda'))
 
 @bp.route('/revert_finalization/<string:username>', methods=['GET'])
 @admin_required
@@ -120,11 +143,14 @@ def revert_finalization(username):
     from .models import Registrant
     rg = Registrant.query.filter_by(username=username).first()
     if rg is None:
-        return redirect(url_for('registrant.beranda'))
+        flash('Registrant tidak ditemukan', 'error')
+        return redirect(url_for('admin.beranda'))
     
     rg.finalized = False
     db.session.add(rg)
     db.session.commit()
+    session['show_menu'] = True
+    flash('Finalisasi pendaftar dengan nama {} telah dibatalkan'.format(rg.name), 'success')
     return redirect(url_for('registrant.beranda'))
 
 @bp.route('/verifikasi_pembayaran/<int:user_id>', methods=['GET', 'POST'])
@@ -134,6 +160,7 @@ def verifikasi_pembayaran(user_id):
     import base64
     rg = Registrant.query.filter_by(id=user_id).first()
     if rg is None:
+        flash('Pendaftar dengan ID {} tidak ditemukan'.format(user_id), 'error')
         return redirect(url_for('admin.beranda'))
     
     if request.method == 'GET':
@@ -160,4 +187,5 @@ def verifikasi_pembayaran(user_id):
         rg.verified_status = request.form['hasil_verifikasi']
         db.session.add(rg)
         db.session.commit()
+        flash('Pembayaran Pendaftar dengan nama {} telah diverifikasi'.format(rg.name), 'success')
         return redirect(url_for('admin.lihat_pembayaran'))

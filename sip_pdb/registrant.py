@@ -1,6 +1,6 @@
 import datetime, os
 from flask import (
-    Blueprint, g, jsonify, render_template, request, send_file, session, url_for, send_from_directory
+    Blueprint, g, jsonify, render_template, request, session, url_for, send_from_directory, get_flashed_messages
 )
 from sqlalchemy.exc import IntegrityError
 from .db import db
@@ -16,6 +16,10 @@ bp = Blueprint('registrant', __name__, url_prefix='/pendaftar')
 @login_required
 def beranda():
     from .models import Registrant
+    notif = {}
+    fl_msg = get_flashed_messages(with_categories=True)
+    for category, message in fl_msg:
+        notif[category] = message
     rg = Registrant.query.filter_by(id=session['user_id']).first()
     return render_template('registrant/beranda.jinja', 
                            username=session['username'],
@@ -23,7 +27,8 @@ def beranda():
                            is_htmx=htmx,
                            show_menu=session['show_menu'],
                            rg=rg,
-                           p_code=str(rg.id).zfill(3)
+                           p_code=str(rg.id).zfill(3),
+                           **notif
                            )
     
 @bp.route('/edit_profil', methods=('GET', 'POST'))
@@ -459,6 +464,12 @@ def rekap():
     wd = Parent.query.filter_by(id=str(session['user_id'])+'_wali').first()
     if wd: 
         if wd.birth_date : parent_data['Wali'] = wd
+    
+    notif = {}
+    fl_msg = get_flashed_messages(with_categories=True)
+    for category, message in fl_msg:
+        notif[category] = message
+        
     return render_template('registrant/rekap.jinja', username=session['username'], 
                            is_admin=session['is_admin'], 
                            is_htmx=htmx, 
@@ -466,7 +477,8 @@ def rekap():
                            rg=rg,
                            pu=pu,
                            rgd=rgd, 
-                           pd=parent_data)
+                           pd=parent_data,
+                           **notif)
 
 @bp.route('/proses_foto', methods=['POST'])
 @login_required
