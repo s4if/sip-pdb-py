@@ -84,9 +84,19 @@
         {{ render_field(form.position) }}
         {{ render_field(form.company) }}
         {{ render_field(form.income) }}
+        <div class="row mb-3">
+        <div id="jumlah_help" class="form-text"></div>
+        </div>
         {{ render_field(form.burden_count) }}
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
     </div>
 </div>
+<script>
+    document.querySelector('input[name="income"]').addEventListener('keyup', () => {
+        let jumlah_bayar = parseInt(document.querySelector('input[name="income"]').value);
+        let formatted = 'Nilainya: Rp. ' + jumlah_bayar.toLocaleString('id-ID') + ',-';
+        document.getElementById('jumlah_help').innerText = formatted;
+    });
+</script>
 {% endblock %}

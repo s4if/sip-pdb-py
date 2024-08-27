@@ -101,8 +101,8 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="mb-3">
                     <label class="form-label">Jumlah Pembayaran</label>
-                    <input type="number" required name="jumlah" class="form-control" placeholder="{{200000 + rg.id}}">
-                </div>
+                    <input type="number" onkeyup="format_idr_beranda()" id="jumlah" required name="jumlah" class="form-control">
+                    <div id="jumlah_help" class="form-text"></div>
                 <div class="mb-3">
                     <label class="form-label">Tanggal Pembayaran</label>
                     <input type="date" required name="tgl_bayar" class="form-control">
@@ -113,6 +113,13 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
+            <script>
+                let format_idr_beranda = () => {
+                    let jumlah_bayar = parseInt(document.getElementById('jumlah').value);
+                    let formatted = 'Nilainya: Rp. ' + jumlah_bayar.toLocaleString('id-ID') + ',-';
+                    document.getElementById('jumlah_help').innerText = formatted;
+                };
+            </script>
         </div>
         <div class="card-footer">
         &nbsp;
