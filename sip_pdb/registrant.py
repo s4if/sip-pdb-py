@@ -826,5 +826,37 @@ def data_pendaftar():
         data.append(tuple(row))
         
     return jsonify({'data':data})
+
+@bp.route('/ganti_password', methods=['GET', 'POST'])
+@login_required
+def ganti_password():
+    from werkzeug.security import generate_password_hash, check_password_hash
+    if request.method == 'GET':
+        return render_template(
+            'registrant/ganti_password.jinja',
+            show_menu=session['show_menu'],
+            is_admin=session['is_admin'],  
+            username=session['username'], 
+            is_htmx=htmx)
+    
+    if request.method == 'POST':
+        notif = {}
+        from .models import Registrant
+        rg = Registrant.query.filter_by(id=session['user_id']).first()
+        if request.form['new_password'] != request.form['confirm_password']:
+            notif['error'] = 'Konfirmasi password tidak sesuai'
+        elif rg and check_password_hash(rg.password, request.form['current_password']):
+            rg.password = generate_password_hash(request.form['new_password'])
+            db.session.commit()
+            notif['success'] = 'Password berhasil diubah'
+        else:
+            notif['error'] = 'Password lama tidak sesuai'
+        return render_template(
+            'registrant/ganti_password.jinja',
+            show_menu=session['show_menu'],
+            is_admin=session['is_admin'],  
+            username=session['username'], 
+            is_htmx=htmx, 
+            **notif)
     
         

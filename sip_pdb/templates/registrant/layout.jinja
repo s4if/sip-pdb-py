@@ -63,7 +63,9 @@
                   PENDAFTAR: {{ username }}
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  <li><a class="dropdown-item" href="#">Ganti Password</a></li>
+                  <li><a class="dropdown-item"
+                    hx-boost="true" hx-target="#hx_content" hx-swap="innerHTML"
+                    href="{{ url_for('registrant.ganti_password') }}">Ganti Password</a></li>
                   <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Sign out</a></li>
                 </ul>
               </div>
