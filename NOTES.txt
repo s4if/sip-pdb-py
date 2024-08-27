@@ -1,0 +1,11 @@
+Make Requirement.txt
+|> poetry export --without-hashes --format=requirements.txt > requirements.txt
+
+Init Database
+|> flask --app sip_pdb db init
+
+Make Migration
+|> flask --app sip_pdb db migrate -m "inisial"
+
+Do Upgrade
+|> flask --app sip_pdb db upgrade

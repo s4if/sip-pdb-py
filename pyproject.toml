@@ -20,6 +20,7 @@ flask-htmx = "^0.3.2"
 pdfkit = "^1.0.0"
 flask-weasyprint = "^1.1.0"
 click = "^8.1.7"
+gunicorn = "^23.0.0"
 
 
 [build-system]
