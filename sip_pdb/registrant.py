@@ -588,6 +588,7 @@ def upload_kwitansi():
     tgl_bayar = request.form['tgl_bayar']
     rg.reg_fee = int(request.form['jumlah'])
     rg.reg_payment_date = datetime.datetime.strptime(tgl_bayar, '%Y-%m-%d').date()
+    rg.verified_status = 0
     db.session.add(rg)
     db.session.commit()
     filename = secure_filename(f.filename)
