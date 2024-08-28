@@ -40,6 +40,27 @@
 </table>
 </div>
 </div>
+<div class="modal fade" id="confirm_delete" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Konfirmasi Hapus</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="confirm_delete_content"></p>
+      </div>
+      <div class="modal-footer" hx-boost="false">
+        <form method="POST" action="{{ url_for('admin.hapus_pendaftar') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="hidden" name="reg_id" id="inp_reg_id"/>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <input type="submit" class="btn btn-danger" id="confirm_delete_btn" value="Hapus">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 $( document ).ready(function() {
     new DataTable('#tabel_utama', {
@@ -47,5 +68,12 @@ $( document ).ready(function() {
         pageLength: 25
     });
 });
+var del_modal = (reg_id) => {
+    // TODO: Kasih nama/username? via ajax? atau htmx?
+    document.getElementById('confirm_delete_content').innerText = "Apakah anda yakin menghapus user dengan id " + reg_id.toString();
+    let dmodal = new bootstrap.Modal(document.getElementById('confirm_delete'));
+    document.getElementById('inp_reg_id').value = reg_id;
+    dmodal.show();
+};
 </script>
 {% endblock %}

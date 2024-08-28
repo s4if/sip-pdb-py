@@ -97,11 +97,43 @@ def data_pendaftar():
         # sementara langsung seperti ini
         item.append("""<a class="btn btn-sm btn-primary" hx-boost="false" 
                     href="{}">Lihat</a>
-                    <a class="btn btn-sm btn-danger" hx-get="#">Delete</a>
-                    """.format(url_for('admin.log_as_registrant', user_id=row.id)))
+                    <a class="btn btn-sm btn-danger" onclick="del_modal({})">Delete</a>
+                    """.format(url_for('admin.log_as_registrant', user_id=row.id), row.id))
         data.append(item)
         
     return jsonify({'data':data})
+
+@bp.route('/hapus_pendaftar', methods=['POST'])
+@admin_required
+def hapus_pendaftar():
+    from .models import Registrant
+    reg_id = request.form.get('reg_id')
+    rg = Registrant.query.filter_by(id=reg_id).first()
+    if rg is None:
+        flash('Registrant tidak ditemukan', 'error')
+        return redirect(url_for('admin.lihat_pendaftar'))
+    
+    rg.deleted = True
+    db.session.add(rg)
+    db.session.commit()
+    flash('Registrant {} di hapus'.format(rg.name), 'success')
+    return redirect(url_for('admin.lihat_pendaftar'))
+
+@bp.route('/restore_pendaftar/<int:reg_id>', methods=['GET'])
+@admin_required
+def restore_pendaftar(reg_id):
+    # TODO: kasih konfirmasi, biar tidak auto restore
+    from .models import Registrant
+    rg = Registrant.query.filter_by(id=reg_id).first()
+    if rg is None:
+        flash('Registrant tidak ditemukan', 'error')
+        return redirect(url_for('admin.lihat_pendaftar'))
+    
+    rg.deleted = False
+    db.session.add(rg)
+    db.session.commit()
+    flash('Registrant {} berhasil dikembalikan'.format(rg.name), 'success')
+    return redirect(url_for('admin.lihat_pendaftar'))
 
 @bp.route('/lihat_pembayaran', methods=['GET'])
 @admin_required
