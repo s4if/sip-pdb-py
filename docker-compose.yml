@@ -1,14 +1,10 @@
-version: "3"
+version: "3.9"
 services:
   sip-pdb:
     build: .
     ports:
-      - 5000:5000
+      - "5000:5000"
     volumes:
-      - type: bind
-        source: ./instance
-        target: /app/instance
-      - type: bind
-        source: ./migrations
-        target: /app/migrations
+      - ./instance:/app/instance
+      - ./migrations:/app/migrations
     restart: unless-stopped
