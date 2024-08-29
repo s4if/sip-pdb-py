@@ -10,6 +10,9 @@
         body {
             padding-top: 75px;
         }
+        body.dimmed {  
+          opacity: 0.5;
+        }
     </style>
     {%if datatables %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/datatables.min.css') }}">
@@ -95,5 +98,13 @@
     {% endif %}
     {% block content %} {% endblock %}
     </div>
+    <script type="text/javascript">
+    document.addEventListener('htmx:beforeRequest', function(event) {
+      document.body.classList.add('dimmed');
+    });
+    document.addEventListener('htmx:afterRequest', function(event) {
+      document.body.classList.remove('dimmed');
+    });
+    </script>
 </body>
 </html>

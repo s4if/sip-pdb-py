@@ -42,6 +42,9 @@
         .sidebar .nav-link.active {
             color: #0d6efd;
         }
+        body.dimmed {  
+          opacity: 0.5;
+        }
     </style>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/htmx.min.js') }}"></script>
@@ -159,6 +162,12 @@
         </div>
     </div>
     <script type="text/javascript">
+    document.addEventListener('htmx:beforeRequest', function(event) {
+      document.body.classList.add('dimmed');
+    });
+    document.addEventListener('htmx:afterRequest', function(event) {
+      document.body.classList.remove('dimmed');
+    });
     const sbToggler = document.getElementById('sb-toggler');
     const sidebar = document.getElementById('sidebar');
     sbToggler.addEventListener('click', () => {
