@@ -9,6 +9,10 @@ from .config import uploaddir
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
+# TODO: implementasi halaman lihat pendaftar dan dokumen
+# TODO: implementasi download excel
+# TODO: implementasi download dokumen pendaftar
+
 @bp.route('/')
 @admin_required
 def beranda():
@@ -45,14 +49,6 @@ def ganti_password():
             notif['error'] = 'Password lama tidak sesuai'
         return render_template('admin/ganti_password.jinja', admin_name=session['admin_name'], is_htmx=htmx, **notif)
 
-# TODO: Implement login sebagai pendaftar dengan memainkan isi session
-'''
-route admin/change_role/<int:user_id>
-    -> get objek -> set username, user_id, name -> set show_menu selalu true -> redirect ke beranda pendaftar
-route admin/back_to_admin/
-    -> hapus username, user_id, name, show_menu -> redirect ke beranda admin
-'''
-
 @bp.route('/lihat_pendaftar', methods=['GET'])
 @admin_required
 def lihat_pendaftar():
@@ -82,6 +78,8 @@ def data_pendaftar():
             Registrant.program.label('program'), #5
             father.income.label('father_income'), #6
             mother.income.label('mother_income'), #7
+            Registrant.finalized.label('finalized'), #8
+            Registrant.username.label('username'), #9
         ).all()
     data = []
     for row in result:
@@ -94,10 +92,18 @@ def data_pendaftar():
         item.append(row.program)
         item.append(row.father_income)
         item.append(row.mother_income)
-        # sementara langsung seperti ini
-        item.append("""<a class="btn btn-sm btn-primary" hx-boost="false" 
-                    href="{}">Lihat</a>
-                    <a class="btn btn-sm btn-danger" onclick="del_modal({})">Delete</a>
+        # sementara langsung seperti inifinalized_str
+        btn1 = ""
+        if row.finalized:
+            btn1 = """
+            <a class="btn btn-sm btn-warning" hx-boost="false" href="{}">Undo Finaliasi</a>
+                        """.format(url_for('admin.revert_finalization', username=row.username))
+        btn2 = ""
+        if session['is_superadmin']:
+            btn2 = """<a class="btn btn-sm btn-primary" hx-boost="false" 
+                        href="{}">Lihat</a>
+                        """.format(url_for('admin.log_as_registrant', user_id=row.id))
+        item.append(btn1 + btn2 + """<a class="btn btn-sm btn-danger" onclick="del_modal({})">Delete</a>
                     """.format(url_for('admin.log_as_registrant', user_id=row.id), row.id))
         data.append(item)
         
@@ -175,6 +181,10 @@ def log_as_registrant(user_id):
         flash('Registrant tidak ditemukan', 'error')
         return redirect(url_for('admin.beranda'))
     
+    if not session['is_superadmin']:
+        flash('Role anda tidak bisa masuk sebagai registrant', 'error')
+        return redirect(url_for('admin.beranda'))
+    
     session['user_id'] = user_id
     session['username'] = rg.username
     session['show_menu'] = True
@@ -202,10 +212,13 @@ def revert_finalization(username):
     rg.finalized = False
     db.session.add(rg)
     db.session.commit()
-    session['show_menu'] = True
     flash('Finalisasi pendaftar dengan nama {} telah dibatalkan'.format(rg.name), 'success')
-    return redirect(url_for('registrant.beranda'))
-
+    if session['is_superadmin']:
+        session['show_menu'] = True
+        return redirect(url_for('registrant.beranda'))
+    else:
+        return redirect(url_for('admin.beranda'))
+        
 @bp.route('/verifikasi_pembayaran/<int:user_id>', methods=['GET', 'POST'])
 @admin_required
 def verifikasi_pembayaran(user_id):

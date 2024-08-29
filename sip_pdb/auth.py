@@ -129,6 +129,7 @@ def login_admin():
             # remember which user has logged in
             session['logged_in'] = True
             session['is_admin'] = True
+            session['is_superadmin'] = a.is_superadmin
             session['admin_name'] = a.username
             return redirect(url_for('admin.beranda'))
         else:

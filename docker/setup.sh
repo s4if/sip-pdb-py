@@ -11,5 +11,6 @@ docker exec $CONTAINER_ID /bin/bash -c "
   flask --app sip_pdb db init
   flask --app sip_pdb db migrate
   flask --app sip_pdb db upgrade
-  flask --app sip_pdb add-admin-user --username ppdb-admin --password defaultpassword
+  flask --app sip_pdb add-admin-user --username superadmin --password defaultpassword --role superadmin
+  flask --app sip_pdb add-admin-user --username ppdb-admin --password defaultpassword --role admin
 "

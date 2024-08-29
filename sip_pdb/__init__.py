@@ -60,11 +60,13 @@ def create_app(test_config=None):
     @click.command()
     @click.option('--username', prompt='Username', help='The username to login with.')
     @click.option('--password', prompt='Password', help='The password to login with.', hide_input=True)
+    @click.option('--role', prompt='Role', help='The role of the admin user.')
     @with_appcontext
-    def add_admin_user(username, password):
+    def add_admin_user(username, password, role):
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
         """Add a new admin user to the database"""
         admin_user = Admin(username=username, password=hashed_password)
+        admin_user.is_superadmin = role == 'superadmin'
         db.session.add(admin_user)
         db.session.commit()
         print(f"Admin user '{username}' added successfully!")
@@ -72,8 +74,9 @@ def create_app(test_config=None):
     @click.command()
     @click.option('--username', prompt='Username', help='The username to login with.')
     @click.option('--password', prompt='Password', help='The password to login with.', hide_input=True)
+    @click.option('--role', prompt='Role', help='The role of the admin user.')
     @with_appcontext
-    def change_admin_user(username, password):
+    def change_admin_user(username, password, role):
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
         """Add a new admin user to the database"""
         admin_user = Admin.query.filter_by(username=username).first()
@@ -81,6 +84,7 @@ def create_app(test_config=None):
             print(f"Admin user '{username}' tidak ditemukan!")
         else:
             admin_user.password = hashed_password
+            admin_user.is_superadmin = role == 'superadmin'
             db.session.add(admin_user)
             db.session.commit()
             print(f"Admin user '{username}' diubah!")
