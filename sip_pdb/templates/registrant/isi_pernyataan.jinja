@@ -118,9 +118,7 @@
         </div>
         <li class="pernyataan">
             Bersedia mengikuti program Qurban minimal 1 kali selama menjadi siswa SMKIT Ihsanul 
-            Fikri Mungkid pada Hari Raya Idul Adha tahun <?php 
-            $tampil_tahun = $tahun_masuk+1;
-            echo $tampil_tahun . '/' . ++$tampil_tahun . '/' . ++$tampil_tahun;?> (Tahun dapat dipilih).
+            Fikri Mungkid pada Hari Raya Idul Adha tahun (Tahun dapat dipilih).
         </li>
         <li class="pernyataan">
             Apabila setelah pendaftaran ulang ternyata anak saya mengundurkan diri, maka saya 
@@ -169,42 +167,42 @@
     <!-- Separator -->
     <div class="col-md-12">
         <label for="raw_scost" class="form-label">Iuran Dana Pendidikan :</label>
-        {% for spp in range(bpm.spp, bpm.spp+1000001, 500000) %}
+        {% for spp in range(bpm.spp, bpm.spp+200001, 100000) %}
         <div class="form-check" onclick="scost_input()">
             <input class="form-check-input" type="radio" name="raw_scost" {% if spp == fv.spp %} checked {% endif %} value="{{ spp }}">
             <label class="form-check-label">{{ format_idr(spp) }}</label>
         </div>
         {% endfor %}
         <div class="form-check" onclick="scost_input()">
-            <input class="form-check-input" type="radio" {% if fv.scost > bpm.spp + 1000001 %} checked {% endif %}
+            <input class="form-check-input" type="radio" {% if fv.scost > bpm.spp + 200001 %} checked {% endif %}
              name="raw_scost" id="scost_other" value="-999">
-            <label class="form-check-label">Lebih dari {{ format_idr(bpm.spp + 1000000) }}</label>
-        </div>
+            <label class="form-check-label">Lebih dari {{ format_idr(bpm.spp + 200001) }}</label>
+        </div>1000000
     </div>
     <div class="col-md-12 {% if fv.scost < bpm.spp + 1000001 %} d-none {% endif %}" id="scost_panel">
-        <label for="other_scost" class="form-label">Jumlah Melebih {{ format_idr(bpm.spp + 1000000) }} Tanpa Titik</label>
+        <label for="other_scost" class="form-label">Jumlah Melebih {{ format_idr(bpm.spp + 200000) }} Tanpa Titik</label>
         <input type="number" class="form-control" id="other_scost" name="other_scost"
-           {% if fv.scost > bpm.spp + 1000000 %} value="{{fv.scost}}" {% endif %} >
+           {% if fv.scost > bpm.spp + 200000 %} value="{{fv.scost}}" {% endif %} >
     </div>
     <!-- Separator -->
     <div class="col-md-12">
         <label for="raw_scost" class="form-label">Wakaf Tanah :</label>
-        {% for wt in range(bpm.wakaf_tanah, bpm.wakaf_tanah+1000001, 500000) %}
+        {% for wt in range(bpm.wakaf_tanah, bpm.wakaf_tanah+200001, 100000) %}
         <div class="form-check" onclick="lcost_input()">
             <input class="form-check-input" type="radio" name="raw_lcost" {% if wt == fv.spp %} checked {% endif %} value="{{ wt }}">
             <label class="form-check-label">{{ format_idr(wt) }}</label>
         </div>
         {% endfor %}
         <div class="form-check" onclick="lcost_input()">
-            <input class="form-check-input" type="radio" {% if fv.lcost > bpm.wakaf_tanah + 1000001 %} checked {% endif %}
+            <input class="form-check-input" type="radio" {% if fv.lcost > bpm.wakaf_tanah + 200001 %} checked {% endif %}
              name="raw_lcost" id="lcost_other" value="-999">
-            <label class="form-check-label">Lebih dari {{ format_idr(bpm.wakaf_tanah + 1000000) }}</label>
+            <label class="form-check-label">Lebih dari {{ format_idr(bpm.wakaf_tanah + 200000) }}</label>
         </div>
     </div>
-    <div class="col-md-12 {% if fv.lcost < bpm.wakaf_tanah + 1000001 %} d-none {% endif %}" id="lcost_panel">
-        <label for="other_lcost" class="form-label">Jumlah Melebih {{ format_idr(bpm.wakaf_tanah + 1000000) }} Tanpa Titik</label>
+    <div class="col-md-12 {% if fv.lcost < bpm.wakaf_tanah + 200001 %} d-none {% endif %}" id="lcost_panel">
+        <label for="other_lcost" class="form-label">Jumlah Melebih {{ format_idr(bpm.wakaf_tanah + 200000) }} Tanpa Titik</label>
         <input type="number" class="form-control" id="other_lcost" name="other_lcost"
-           {% if fv.lcost > bpm.wakaf_tanah + 1000000 %} value="{{fv.lcost}}" {% endif %} >
+           {% if fv.lcost > bpm.wakaf_tanah + 200001 %} value="{{fv.lcost}}" {% endif %} >
     </div>
     <!-- Separator -->
     <div class="col-md-12">
@@ -217,7 +215,7 @@
     </div>
     <div class="col-md-12">
         <label class="form-label">Bersedia mengikuti program Qurban minimal 1 kali selama menjadi siswa pada Hari Raya Idul Adha tahun</label>
-        <div class="form-check">
+        <div class="form-check" hidden>
             <input class="form-check-input" type="checkbox" id="q1" name="q1" value="{{ tahun_masuk }}" 
             {% if ( tahun_masuk | string ) in fv.qurban %} checked {% endif %}>
             <label class="form-check-label" for="q1">{{ tahun_masuk }}</label>
