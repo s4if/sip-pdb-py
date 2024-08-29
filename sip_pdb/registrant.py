@@ -401,7 +401,11 @@ def isi_pernyataan():
     from .models import Registrant
     biaya_tetap = PDB_CONFIG['biaya_tetap']
     tahun_masuk = PDB_CONFIG['tahun_masuk']
+    rg = Registrant.query.filter_by(id=session['user_id']).first()
     bpm = offset_bpm(PDB_CONFIG['biaya_pendidikan_minimal']) # bpm -> biaya pendidikan minimal
+    if rg.program == 'Industri' and rg.selection_path == 'Jalur Reguler': # kelas industri tambah 200K
+        bpm['spp'] = bpm['spp'] + 200000
+    
     fv = { # fv -> Form Value
         'icost' : 0,
         'scost' : 0,
@@ -409,7 +413,6 @@ def isi_pernyataan():
         'main_parent' : 'father',
         'qurban': ''
     }
-    rg = Registrant.query.filter_by(id=session['user_id']).first()
     if request.method == 'POST':
         failure = []
         fv['icost'] = int(request.form['raw_icost'])
