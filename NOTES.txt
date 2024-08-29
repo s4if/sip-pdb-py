@@ -10,8 +10,17 @@ Make Migration
 Do Upgrade
 |> flask --app sip_pdb db upgrade
 
-Run via Docker
+Install via Docker
+|> mkdir instance && mkdir migrations
+|> chmod a+rwx instance && chmod a+rwx migrations
 |> docker run -dp 5000:5000 \
     --mount type=bind,source=./instance,target=/app/instance \
     --mount type=bind,source=./migrations,target=/app/migrations \
     sip-pdb
+|> ./docker/setup.sh
+
+Install via Docker Compose
+|> mkdir instance && mkdir migrations
+|> chmod a+rwx instance && chmod a+rwx migrations
+|> docker compose up -d --build
+|> ./docker/setup.sh

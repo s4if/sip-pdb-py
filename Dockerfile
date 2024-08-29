@@ -24,4 +24,4 @@ COPY . /app
 EXPOSE 5000
 
 # Run gunicorn server
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "sip_pdb:create_app()"]
+CMD ["gunicorn", "-w", "2", "-k", "gevent", "--bind", "0.0.0.0:5000", "sip_pdb:create_app()"]
