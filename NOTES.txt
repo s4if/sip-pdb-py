@@ -24,3 +24,6 @@ Install via Docker Compose
 |> chmod a+rwx instance && chmod a+rwx migrations
 |> docker compose up -d --build
 |> ./docker/setup.sh
+
+TODO: Buat halaman untuk cek dokumen yang sudah diupload oleh siswa
+TODO: Buat modul download data sebagai excel (pakai openpyxl? atau xlsxwriter?)

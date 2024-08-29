@@ -6,20 +6,27 @@
 
 {% block content %}
 <div class="row">
-<div class="col text-center">
-<h1>Login {{'Admin' if is_admin else 'Pendaftar'}}</h1>
-</div>
-</div>
-<div class="row">
-	<div class="col">
-		<form method="POST" 
-		action="{{ url_for('auth.login_admin') if is_admin else url_for('auth.login') }}" 
-		hx-boost="false">
-		  {{ form.csrf_token }}
-		  {{ render_field(form.username) }}
-		  {{ render_field(form.password) }}
-		  <button type="submit" class="btn btn-primary">Submit</button>
-		</form>
+	<div class="col d-flex justify-content-center align-items-center ">
+		<div class="card rounded-0 mb-3" style="max-width: 540px;">
+        <div class="row g-0">
+            <div class="col-sm-4 d-flex" style="padding: 0.7em;">
+            <img src="{{ url_for('static', filename='img/logo_smk.png')}}" class="img-fluid align-self-center" alt="...">
+            </div>
+            <div class="col-sm-8">
+            <div class="card-body">
+                <h5 class="card-title">Login {{'Admin' if is_admin else 'Calon Peserta Didik'}}</h5>
+				<form method="POST" 
+					action="{{ url_for('auth.login_admin') if is_admin else url_for('auth.login') }}" 
+					hx-boost="false">
+					{{ form.csrf_token }}
+					{{ render_field(form.username) }}
+					{{ render_field(form.password) }}
+					<button type="submit" class="btn btn-primary">Submit</button>
+				</form>
+			</div>
+            </div>
+        </div>
+        </div>
 	</div>
 </div>
 {% endblock %}
