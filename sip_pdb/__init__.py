@@ -55,7 +55,7 @@ def create_app(test_config=None):
     
     @app.route('/')
     def root_dir():
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.register'))
     
     @click.command()
     @click.option('--username', prompt='Username', help='The username to login with.')

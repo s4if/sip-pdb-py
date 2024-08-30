@@ -7,7 +7,16 @@
 	<div class="col d-flex justify-content-center align-items-center ">
 		<div class="card rounded-0 mb-3" style="max-width: 680px;">
             <div class="card-body">
-                <h5 class="card-title">Registrasi Calon Peserta Ddidk</h5>
+                <div class="container-fluid">
+                <div class="row">
+                <div class="col-sm-4 d-flex justify-content-end align-items-center">
+                <img src="{{ url_for('static', filename='img/logo_smk.png')}}" class="img-fluid" alt="..." style="max-width: 50px; max-height:50px;">
+                </div>
+                <div class="col-sm-8 d-flex justify-content-end align-items-left">
+                <h5 class="card-title">Registrasi Calon Peserta Didik</h5>
+                </div>
+                </div>
+                </div>
                 <form method="POST" action="{{ url_for('auth.register')}}" hx-boost="false">
                 {{ form.csrf_token }}
                 {{ render_field(form.username) }}
