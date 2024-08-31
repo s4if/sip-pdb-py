@@ -8,3 +8,5 @@ services:
       - ./instance:/app/instance
       - ./migrations:/app/migrations
     restart: unless-stopped
+    environment:
+      SECRET_KEY: "ini-nanti-di-ganti"
