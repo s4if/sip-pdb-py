@@ -74,7 +74,7 @@
                   hx-target="#hx_content" 
                   hx-swap="innerHTML"
                   >Ganti Password</a></li>
-                  <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Sign out</a></li>
+                  <li><a hx-boost="false" class="dropdown-item" href="{{ url_for('auth.logout') }}">Sign out</a></li>
                 </ul>
               </div>
         </div>

@@ -167,7 +167,7 @@
     <!-- Separator -->
     <div class="col-md-12">
         <label for="raw_scost" class="form-label">Iuran Dana Pendidikan :</label>
-        {% for spp in range(bpm.spp, bpm.spp+200001, 100000) %}
+        {% for spp in range(bpm.spp, bpm.spp+200001, 200000) %}
         <div class="form-check" onclick="scost_input()">
             <input class="form-check-input" type="radio" name="raw_scost" {% if spp == fv.spp %} checked {% endif %} value="{{ spp }}">
             <label class="form-check-label">{{ format_idr(spp) }}</label>
@@ -177,7 +177,7 @@
             <input class="form-check-input" type="radio" {% if fv.scost > bpm.spp + 200001 %} checked {% endif %}
              name="raw_scost" id="scost_other" value="-999">
             <label class="form-check-label">Lebih dari {{ format_idr(bpm.spp + 200001) }}</label>
-        </div>1000000
+        </div>
     </div>
     <div class="col-md-12 {% if fv.scost < bpm.spp + 1000001 %} d-none {% endif %}" id="scost_panel">
         <label for="other_scost" class="form-label">Jumlah Melebih {{ format_idr(bpm.spp + 200000) }} Tanpa Titik</label>
