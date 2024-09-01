@@ -1,0 +1,137 @@
+{% if not is_htmx %}
+    {% extends "admin/layout.jinja" %}
+    {% block title %}Profil Pendaftar: {{rg.name}}{% endblock %}
+{% else %}
+    <title>Profil Pendaftar: {{rg.name}}</title>
+{% endif %}
+
+{% from 'macros.jinja' import render_notif, render_field %}
+
+{% block content %}
+
+{{ render_notif(error, success, info) }}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.beranda') }}">Beranda</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.lihat_pendaftar') }}">Pendaftar</a></li>
+        <li class="breadcrumb-item active">Lihat Profil</li>
+    </ol>
+</nav>
+<h1 class="h2">Profil Pendaftar</h1>
+<p>Nama: {{rg.name}}</p>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+        <div class="card-header">
+            Data Diri
+        </div>
+        <div class="card-body">
+            <div class="container">
+            <div class="row">
+            <div class="col-md-2">
+            <img src="{{ url_for('admin.get_foto', reg_id=rg.id, tipe='foto')}}" class="img-fluid">
+            </div>
+            <div class="col-md-10">
+            <table>
+                <tr>
+                    <td>Nama</td><td>&nbsp;:&nbsp;<td>{{rg.name}}</td>
+                </tr>
+                <tr>
+                    <td>Gender</td><td>&nbsp;:&nbsp;<td>{{rg.gender}}</td>
+                </tr>
+                <tr>
+                    <td>Asal Sekolah</td><td>&nbsp;:&nbsp;<td>{{rg.prev_school}}</td>
+                </tr>
+                <tr>
+                    <td>NISN</td><td>&nbsp;:&nbsp;<td>{{rg.nisn}}</td>
+                </tr>
+                <tr>
+                    <td>Kontak</td><td>&nbsp;:&nbsp;<td>{{rg.cp}}</td>
+                </tr>
+                <tr>
+                    <td>Program Pilihan</td><td>&nbsp;:&nbsp;<td>{{rg.program}}</td>
+                </tr>
+                <tr>
+                    <td>Jalur Masuk</td><td>&nbsp;:&nbsp;<td>{{rg.selection_path}}</td>
+                </tr>
+            </table>
+            </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+<div class="col">
+&nbsp;
+</div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+        <div class="card-header">
+            Kelengkapan Data
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                {%- for key, value in status.items() %}
+                <li class="list-group-item">{{ value }}</li>
+                {%- endfor %}
+            </ul>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+    &nbsp;
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+    <h4>Dokumen yang sudah diupload: </h4>
+    </div>
+</div>
+
+{% for doc in docs %}
+<div class="row">
+    <div class="col">
+    &nbsp;
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+        <div class="card-header">
+            {{doc.filename}}
+        </div>
+        <div class="card-body">
+        <div class="row">
+        <div class="col">
+            <table>
+            <tr><td>Namafile</td><td>&nbsp;:&nbsp;</td><td>{{doc.filename}}</td></tr>
+            <tr><td>Tipe</td><td>&nbsp;:&nbsp;</td><td>{{doc.type}}</td></tr>
+            <tr><td>Tanggal Terbit</td><td>&nbsp;:&nbsp;</td><td>{{doc.issued_date}}</td></tr>
+            <tr><td>Keterangan</td><td>&nbsp;:&nbsp;</td><td>{{doc.note}}</td></tr>
+            </table>
+        </div>
+        </div>
+        <div class="row">
+        <div class="col">
+        <img src="{{ url_for('admin.get_doc', reg_id=rg.id, filename=doc.filename)}}" class="img-fluid">
+        </div>
+        </div>
+        </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
