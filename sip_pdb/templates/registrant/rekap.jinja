@@ -19,12 +19,12 @@
 </nav>
 <h1 class="h2">Rekap Data Pendaftar</h1>
 <div class="row">
-    <div class="<col>">
+    <div class="col">
         <h4>Data Diri</h4>
     </div>
 </div>
 <div class="row">
-    <div class="<col>">
+    <div class="col">
         <table>
         <tr>
             <td>Nama</td><td>&nbsp;:&nbsp;<td>{{rg.name}}</td>
@@ -106,19 +106,19 @@
     </div>
 </div>
 <div class="row">
-    <div class="<col>">
+    <div class="col">
         <hr />
     </div>
 </div>
 
 {% for tipe, obj in pd.items() %}
 <div class="row">
-    <div class="<col>">
+    <div class="col">
         <h4>Data {{ tipe }}</h4>
     </div>
 </div>
 <div class="row">
-    <div class="<col>">
+    <div class="col">
         <table>
         <tr>
             <td>Nama</td><td>&nbsp;:&nbsp;</td><td>{{obj.name}}</td>
@@ -176,19 +176,19 @@
     </div>
 </div>
 <div class="row">
-    <div class="<col>">
+    <div class="col">
         <hr />
     </div>
 </div>
 {% endfor %}
 
 <div class="row">
-    <div class="<col>">
+    <div class="col">
         <h4>Data Pembayaran</h4>
     </div>
 </div>
 <div class="row">
-    <div class="<col>">
+    <div class="col">
         <table>
         <tr>
             <td>Infaq Pendidikan</td><td>&nbsp;:&nbsp;<td>{{ format_idr(rg.initial_cost) if rg.initial_cost else "-" }}</td>
@@ -207,12 +207,12 @@
     </div>
 </div>
 <div class="row">
-    <div class="<col>">
+    <div class="col">
         <hr />
     </div>
 </div>
 <div class="row">
-    <div class="<col>">
+    <div class="col">
         {% if rg.finalized %}
         <p>Jika ternyata masih terdapat kesalahan data setelah finalisasi, silahkan hubungi panitia.</p>
         {% elif rgd and pd.Ayah and pd.Ibu and pu  %}

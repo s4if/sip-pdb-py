@@ -22,6 +22,7 @@ flask-weasyprint = "^1.1.0"
 click = "^8.1.7"
 gunicorn = {extras = ["gevent"], version = "^23.0.0"}
 gevent = "^24.2.1"
+openpyxl = "^3.1.5"
 
 
 [build-system]

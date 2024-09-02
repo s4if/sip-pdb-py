@@ -25,5 +25,9 @@ Install via Docker Compose
 |> docker compose up -d --build
 |> ./docker/setup.sh
 
+>> In Dev
 TODO: Buat halaman untuk cek dokumen yang sudah diupload oleh siswa
 TODO: Buat modul download data sebagai excel (pakai openpyxl? atau xlsxwriter?)
+
+>> In Main
+TODO: Bugfix

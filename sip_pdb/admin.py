@@ -1,6 +1,6 @@
 import datetime, os
 from flask import (
-    Blueprint, g, jsonify, render_template, request, session, url_for, redirect, flash, get_flashed_messages
+    Blueprint, g, jsonify, render_template, request, session, url_for, redirect, flash, get_flashed_messages, send_from_directory
 )
 from sqlalchemy.exc import IntegrityError
 from .db import db
@@ -59,6 +59,43 @@ def lihat_pendaftar():
         
     return render_template('admin/lihat_pendaftar.jinja', admin_name=session['admin_name'], is_htmx=htmx, **notif)
 
+@bp.route('/lihat_pendaftar/<int:reg_id>', methods=['GET'])
+@admin_required
+def lihat_pendaftar_detail(reg_id):
+    notif = {}
+    fl_msg = get_flashed_messages(with_categories=True)
+    for category, message in fl_msg:
+        notif[category] = message
+    
+    from .models import Registrant, RegistrantData, Document, Parent
+    rg = Registrant.query.filter_by(id=reg_id).first()
+    rgd = RegistrantData.query.filter_by(id=reg_id).first()
+    datadir = os.path.join(uploaddir, rg.username)
+    pu = os.path.isfile(os.path.join(datadir, f'{reg_id}_foto.png'))
+    fd = Parent.query.filter_by(id=str(reg_id)+'_ayah').first()
+    md = Parent.query.filter_by(id=str(reg_id)+'_ibu').first()
+    wd = Parent.query.filter_by(id=str(reg_id)+'_wali').first()
+    docs = Document.query.filter_by(registrant_id=reg_id).all()
+    ps_string = ['Bukti Pembayaran Tidak Valid', 'Belum di verifikasi', 'Bukti Pembayaran Berhasil Diverifikasi']
+    status = {
+        'pembayaran': ps_string[rg.verified_status+1],
+        'upload_foto': 'Foto Sudah Terupload' if pu else 'Foto Belum Terupload',
+        'data_diri': 'Data Diri Sudah Terisi' if rgd else 'Data Diri Belum Terisi',
+        'data_ayah': 'Data Ayah Sudah Terisi' if fd else 'Data Ayah Belum Terisi',
+        'data_ibu': 'Data Ibu Sudah Terisi' if md else 'Data Ibu Belum Terisi', 
+        'data_wali': 'Data Wali Sudah Terisi' if wd else 'Data Wali Belum Terisi (tidak wajib)'
+    }
+    
+    return render_template('admin/lihat_profil.jinja', 
+                           admin_name=session['admin_name'],
+                           rg=rg,
+                           docs=docs,
+                           reg_id=reg_id, 
+                           is_htmx=htmx,
+                           status=status,
+                           **notif
+                        )
+
 @bp.route('/data_pendaftar', methods=['GET'])
 @admin_required
 def data_pendaftar():
@@ -80,6 +117,9 @@ def data_pendaftar():
             mother.income.label('mother_income'), #7
             Registrant.finalized.label('finalized'), #8
             Registrant.username.label('username'), #9
+            Registrant.cp.label('no_telp'), #10
+            father.contact.label('no_telp_ayah'), #11
+            mother.contact.label('no_telp_ibu') #12
         ).all()
     data = []
     for row in result:
@@ -90,24 +130,60 @@ def data_pendaftar():
         item.append(row.prev_school)
         item.append(row.selection_path)
         item.append(row.program)
-        item.append(row.father_income)
-        item.append(row.mother_income)
+        item.append(row.no_telp)
+        item.append(row.no_telp_ayah)
+        item.append(row.no_telp_ibu)
         # sementara langsung seperti inifinalized_str
-        btn1 = ""
-        if row.finalized:
-            btn1 = """
-            <a class="btn btn-sm btn-warning" hx-boost="false" href="{}">Undo Finaliasi</a>
-                        """.format(url_for('admin.revert_finalization', username=row.username))
-        btn2 = ""
-        if session['is_superadmin']:
-            btn2 = """<a class="btn btn-sm btn-primary" hx-boost="false" 
+        item.append("""<div class="btn-group" role="group" >
+                    <a class="btn btn-sm btn-primary" hx-boost="true" hx-target="#hx_content" 
                         href="{}">Lihat</a>
-                        """.format(url_for('admin.log_as_registrant', user_id=row.id))
-        item.append(btn1 + btn2 + """<a class="btn btn-sm btn-danger" onclick="del_modal({})">Delete</a>
-                    """.format(url_for('admin.log_as_registrant', user_id=row.id), row.id))
+                    <a class="btn btn-sm btn-danger" onclick="del_modal({})">Hapus</a></div>
+                    """.format(url_for('admin.lihat_pendaftar_detail', reg_id=row.id),row.id))
         data.append(item)
         
     return jsonify({'data':data})
+
+@bp.route('/get_foto/<int:reg_id>/<string:tipe>')
+@admin_required
+def get_foto(reg_id, tipe):
+    from .models import Registrant
+    rg = Registrant.query.filter_by(id=reg_id).first()
+    if not rg:
+        return 'Pendaftar tidak ditemukan', 404
+    
+    # Validate the tipe parameter to prevent arbitrary file access
+    if tipe not in ['foto', 'kwitansi']:  # add valid types here
+        return 'Tipe tidak valid', 400
+
+    datadir = os.path.join(uploaddir, str(rg.username))
+    filepath = os.path.join(datadir, f'{reg_id}_{tipe}.png')
+
+    # Check if the file exists and is a file (not a directory)
+    if os.path.isfile(filepath) and not os.path.isdir(filepath):
+        # Use send_from_directory to prevent directory traversal attacks
+        return send_from_directory(datadir, f'{reg_id}_{tipe}.png', mimetype='image/png')
+    else:
+        return 'Foto tidak ditemukan', 404
+
+
+@bp.route('/get_doc/<int:reg_id>/<string:filename>')
+@admin_required
+def get_doc(reg_id, filename):
+    from .models import Registrant
+    rg = Registrant.query.filter_by(id=reg_id).first()
+    if not rg:
+        return 'Pendaftar tidak ditemukan', 404
+    
+    datadir = os.path.join(uploaddir, str(rg.username))
+    filepath = os.path.join(datadir, filename)
+    if os.path.isfile(filepath):
+        # Validate the file type to prevent arbitrary file access
+        if not filename.endswith(('.png')):
+            return 'Tipe file tidak valid', 400
+        # Use send_from_directory to prevent directory traversal attacks
+        return send_from_directory(datadir, filename, mimetype='image/png')
+    else:
+        return 'Foto tidak ditemukan', 404
 
 @bp.route('/hapus_pendaftar', methods=['POST'])
 @admin_required
