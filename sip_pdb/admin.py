@@ -83,7 +83,7 @@ def lihat_pendaftar_detail(reg_id):
         'data_diri': 'Data Diri Sudah Terisi' if rgd else 'Data Diri Belum Terisi',
         'data_ayah': 'Data Ayah Sudah Terisi' if fd else 'Data Ayah Belum Terisi',
         'data_ibu': 'Data Ibu Sudah Terisi' if md else 'Data Ibu Belum Terisi', 
-        'data_wali': 'Data Wali Sudah Terisi' if wd else 'Data Wali Belum Terisi'
+        'data_wali': 'Data Wali Sudah Terisi' if wd else 'Data Wali Belum Terisi (tidak wajib)'
     }
     
     return render_template('admin/lihat_profil.jinja', 
@@ -117,6 +117,9 @@ def data_pendaftar():
             mother.income.label('mother_income'), #7
             Registrant.finalized.label('finalized'), #8
             Registrant.username.label('username'), #9
+            Registrant.cp.label('no_telp'), #10
+            father.contact.label('no_telp_ayah'), #11
+            mother.contact.label('no_telp_ibu') #12
         ).all()
     data = []
     for row in result:
@@ -127,24 +130,15 @@ def data_pendaftar():
         item.append(row.prev_school)
         item.append(row.selection_path)
         item.append(row.program)
-        item.append(row.father_income)
-        item.append(row.mother_income)
+        item.append(row.no_telp)
+        item.append(row.no_telp_ayah)
+        item.append(row.no_telp_ibu)
         # sementara langsung seperti inifinalized_str
-        btn1 = ""
-        if row.finalized:
-            btn1 = """
-            <a class="btn btn-sm btn-warning" hx-boost="false" href="{}">Undo Finaliasi</a>
-                        """.format(url_for('admin.revert_finalization', username=row.username))
-        btn2 = ""
-        if session['is_superadmin']:
-            btn2 = """<a class="btn btn-sm btn-secondary" hx-boost="false" 
-                        href="{}">Masuk Sebagai Pendaftar</a>
-                        """.format(url_for('admin.log_as_registrant', user_id=row.id))
-        btn3 = """<a class="btn btn-sm btn-success" hx-boost="true" hx-target="#hx_content" 
-                        href="{}">Lihat Pendaftar</a>
-                        """.format(url_for('admin.lihat_pendaftar_detail', reg_id=row.id))
-        item.append(btn1 + btn2 + btn3 +"""<a class="btn btn-sm btn-danger" onclick="del_modal({})">Delete</a>
-                    """.format(url_for('admin.log_as_registrant', user_id=row.id), row.id))
+        item.append("""<div class="btn-group" role="group" >
+                    <a class="btn btn-sm btn-primary" hx-boost="true" hx-target="#hx_content" 
+                        href="{}">Lihat</a>
+                    <a class="btn btn-sm btn-danger" onclick="del_modal({})">Hapus</a></div>
+                    """.format(url_for('admin.lihat_pendaftar_detail', reg_id=row.id),row.id))
         data.append(item)
         
     return jsonify({'data':data})

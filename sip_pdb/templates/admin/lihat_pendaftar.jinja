@@ -30,8 +30,9 @@
             <th>Sekolah Asal</th>
             <th>Jalur Seleksi</th>
             <th>Kelas Pilihan</th>
-            <th>Penghasilan Ayah</th>
-            <th>Penghasilan Ibu</th>
+            <th>No. Telp</th>
+            <th>No. Telp Ayah</th>
+            <th>No. Telp Ibu</th>
             <th>Aksi</th>
         </tr>
     </thead>
@@ -65,7 +66,9 @@
 $( document ).ready(function() {
     new DataTable('#tabel_utama', {
         ajax: "{{url_for('admin.data_pendaftar')}}",
-        pageLength: 25
+        pageLength: 25,
+        scrollX: true,
+        scrollY: 400
     });
 });
 var del_modal = (reg_id) => {
