@@ -93,6 +93,7 @@ def lihat_pendaftar_detail(reg_id):
                            reg_id=reg_id, 
                            is_htmx=htmx,
                            status=status,
+                           is_superadmin=session['is_superadmin'],
                            **notif
                         )
 

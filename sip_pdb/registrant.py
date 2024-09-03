@@ -4,7 +4,7 @@ from flask import (
 )
 from sqlalchemy.exc import IntegrityError
 from .db import db
-from .helper import htmx, login_required
+from .helper import htmx, login_required, admin_required
 from .config import uploaddir
 
 bp = Blueprint('registrant', __name__, url_prefix='/pendaftar')
@@ -826,6 +826,18 @@ def download_kartu_pendaftaran():
                            pd=parent_data)
     return render_pdf(HTML(string=str_isi))
 
+@bp.route('/download/kartu_pendaftaran/admin/<int:reg_id>', methods=['GET'])
+@admin_required
+def download_kartu_pendaftaran_admin(reg_id):
+    from .models import Registrant
+    rg = Registrant.query.filter_by(id=reg_id).first()
+    session['user_id'] = reg_id
+    session['username'] = rg.username
+    return_obj = download_kartu_pendaftaran()
+    session.pop('user_id', None)
+    session.pop('username', None)
+    return return_obj
+
 @bp.route('/download/surat_pernyataan', methods=['GET'])
 @login_required
 def download_surat_pernyataan():
@@ -855,6 +867,18 @@ def download_surat_pernyataan():
                               tanggal=tanggal,
                               **biaya_tetap)
     return render_pdf(HTML(string=str_isi))
+
+@bp.route('/download/surat_pernyataan/admin/<int:reg_id>', methods=['GET'])
+@admin_required
+def download_surat_pernyataan_admin(reg_id):
+    from .models import Registrant
+    rg = Registrant.query.filter_by(id=reg_id).first()
+    session['user_id'] = reg_id
+    session['username'] = rg.username
+    return_obj = download_surat_pernyataan()
+    session.pop('user_id', None)
+    session.pop('username', None)
+    return return_obj
 
 @bp.route('/data_pendaftar')
 def data_pendaftar():

@@ -81,11 +81,19 @@
             <a class="btn btn-warning" hx-boost="false" 
             href="{{url_for('admin.revert_finalization', username=rg.username)}}">Undo Finaliasi</a>
             &nbsp;
+            {% if is_superadmin %}
             <a class="btn btn-secondary" hx-boost="false"  href="{{url_for('admin.log_as_registrant', user_id=rg.id)}}">
             Masuk Sebagai Pendaftar</a>
             &nbsp;
+            {% endif %}
             <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#change_password_modal"
             href="#">Reset Password</a>
+            &nbsp;
+            <a class="btn btn-info" hx-boost="false"  href="{{url_for('registrant.download_kartu_pendaftaran_admin', reg_id=rg.id)}}">
+            Unduh Kartu Pendaftaran</a>
+            &nbsp;
+            <a class="btn btn-success" hx-boost="false"  href="{{url_for('registrant.download_surat_pernyataan_admin', reg_id=rg.id)}}">
+            Unduh Surat Pernyataan</a>
         </div>
         </div>
     </div>
