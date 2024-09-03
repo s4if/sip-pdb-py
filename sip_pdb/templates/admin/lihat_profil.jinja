@@ -91,7 +91,7 @@
             <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#change_password_modal" href="#">
             Reset Password</a>
             &nbsp;
-            {% if status.upload_foto and status.data_diri and status.data_ayah and status.data_ibu3 %}
+            {% if status.upload_foto and status.data_diri and status.data_ayah and status.data_ibu %}
             <a class="btn btn-info" hx-boost="false"  href="{{url_for('registrant.download_kartu_pendaftaran_admin', reg_id=rg.id)}}">
             Unduh Kartu Pendaftaran</a>
             &nbsp;
