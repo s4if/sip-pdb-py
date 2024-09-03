@@ -125,8 +125,8 @@ def data_pendaftar():
     data = []
     for row in result:
         item = []
-        item.append(row.id)
         item.append(row.reg_id)
+        item.append(row.username)
         item.append(row.name)
         item.append(row.prev_school)
         item.append(row.selection_path)
