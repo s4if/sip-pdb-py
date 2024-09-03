@@ -84,7 +84,7 @@
             <a class="btn btn-secondary" hx-boost="false"  href="{{url_for('admin.log_as_registrant', user_id=rg.id)}}">
             Masuk Sebagai Pendaftar</a>
             &nbsp;
-            <a class="btn btn-danger" hx-boost="false" 
+            <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#change_password_modal"
             href="#">Reset Password</a>
         </div>
         </div>
@@ -160,4 +160,44 @@
     </div>
 </div>
 {% endfor %}
+
+<div class="modal fade" id="change_password_modal" tabindex="-1" aria-labelledby="change_password_modal_label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="change_password_modal_label">Reset Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('admin.reset_password_pendaftar', reg_id=rg.id) }}"
+            hx-boost="false">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="mb-3">
+                <label class="form-label" for="new_password">Password Baru</label>
+                <input type="password" onkeyup="cek_password()" class="form-control" id="new_password" name="new_password" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="confirm_password">Konfirmasi Password</label>
+                <input type="password" onkeyup="cek_password()" class="form-control" id="confirm_password" name="confirm_password" required>
+                <div id="password_help" class="form-text"></div>
+            </div>
+            <div class="mb-3">
+                <button type="submit" id="bt_submit" class="btn btn-primary">Reset Password</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+let cek_password = () => {
+    if(document.getElementById("new_password").value != document.getElementById("confirm_password").value){
+        document.getElementById("password_help").innerText = "Password tidak sama";
+        document.getElementById("bt_submit").disabled = true;
+    }else{
+        document.getElementById("password_help").innerText = "Password sudah sama";
+        document.getElementById("bt_submit").disabled = false;
+    }
+};
+</script>
 {% endblock %}
