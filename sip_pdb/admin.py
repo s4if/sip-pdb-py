@@ -201,6 +201,28 @@ def hapus_pendaftar():
     flash('Registrant {} di hapus'.format(rg.name), 'success')
     return redirect(url_for('admin.lihat_pendaftar'))
 
+@bp.route('/reset_password_pendaftar/<int:reg_id>', methods=['POST'])
+@admin_required
+def reset_password_pendaftar(reg_id):
+    from .models import Registrant
+    from werkzeug.security import generate_password_hash
+    rg = Registrant.query.filter_by(id=reg_id).first()
+    if rg is None:
+        flash('Registrant tidak ditemukan', 'error')
+        return redirect(url_for('admin.lihat_pendaftar_detail', reg_id=reg_id))
+    
+    new_password = request.form.get('new_password')
+    confirm_password = request.form.get('confirm_password')
+    if new_password != confirm_password:
+        flash('Konfirmasi password tidak sesuai', 'error')
+        return redirect(url_for('admin.lihat_pendaftar_detail', reg_id=reg_id))
+    
+    rg.password = generate_password_hash(new_password)
+    db.session.add(rg)
+    db.session.commit()
+    flash('Password pendaftar {} berhasil di reset'.format(rg.name), 'success')
+    return redirect(url_for('admin.lihat_pendaftar_detail', reg_id=reg_id))
+
 @bp.route('/restore_pendaftar/<int:reg_id>', methods=['GET'])
 @admin_required
 def restore_pendaftar(reg_id):
