@@ -78,12 +78,12 @@ def lihat_pendaftar_detail(reg_id):
     docs = Document.query.filter_by(registrant_id=reg_id).all()
     ps_string = ['Bukti Pembayaran Tidak Valid', 'Belum di verifikasi', 'Bukti Pembayaran Berhasil Diverifikasi']
     status = {
-        'pembayaran': ps_string[rg.verified_status+1],
-        'upload_foto': 'Foto Sudah Terupload' if pu else 'Foto Belum Terupload',
-        'data_diri': 'Data Diri Sudah Terisi' if rgd else 'Data Diri Belum Terisi',
-        'data_ayah': 'Data Ayah Sudah Terisi' if fd else 'Data Ayah Belum Terisi',
-        'data_ibu': 'Data Ibu Sudah Terisi' if md else 'Data Ibu Belum Terisi', 
-        'data_wali': 'Data Wali Sudah Terisi' if wd else 'Data Wali Belum Terisi (tidak wajib)'
+        'upload_foto': pu,
+        'data_diri': rgd,
+        'data_ayah': fd,
+        'data_ibu': md, 
+        'data_wali': wd,
+        'surat_pernyataan': rg.initial_cost != 0 and rg.monthly_cost != 0 and rg.land_donation != 0,
     }
     
     return render_template('admin/lihat_profil.jinja', 

@@ -78,22 +78,28 @@
             Aksi Admin
         </div>
         <div class="card-body">
+            {% if rg.finalized %}
             <a class="btn btn-warning" hx-boost="false" 
             href="{{url_for('admin.revert_finalization', username=rg.username)}}">Undo Finaliasi</a>
             &nbsp;
+            {% endif %}
             {% if is_superadmin %}
             <a class="btn btn-secondary" hx-boost="false"  href="{{url_for('admin.log_as_registrant', user_id=rg.id)}}">
             Masuk Sebagai Pendaftar</a>
             &nbsp;
             {% endif %}
-            <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#change_password_modal"
-            href="#">Reset Password</a>
+            <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#change_password_modal" href="#">
+            Reset Password</a>
             &nbsp;
+            {% if status.upload_foto and status.data_diri and status.data_ayah and status.data_ibu3 %}
             <a class="btn btn-info" hx-boost="false"  href="{{url_for('registrant.download_kartu_pendaftaran_admin', reg_id=rg.id)}}">
             Unduh Kartu Pendaftaran</a>
             &nbsp;
+            {% endif %}
+            {% if status.surat_pernyataan %}
             <a class="btn btn-success" hx-boost="false"  href="{{url_for('registrant.download_surat_pernyataan_admin', reg_id=rg.id)}}">
             Unduh Surat Pernyataan</a>
+            {% endif %}
         </div>
         </div>
     </div>
@@ -113,9 +119,66 @@
         </div>
         <div class="card-body">
             <ul class="list-group list-group-flush">
-                {%- for key, value in status.items() %}
-                <li class="list-group-item">{{ value }}</li>
-                {%- endfor %}
+                {% if rg.reg_fee == 0 and rg.verified_status == 0 %}
+                <li class="list-group-item list-group-item-warning">
+                    <i class="bi bi-exclamation-triangle"></i></i>&nbsp;Belum upload kwitansi biaya pendaftaran
+                </li>
+                {% elif rg.verified_status == 0 %}
+                <li class="list-group-item list-group-item-secondary">
+                    <i class="bi bi-hourglass"></i>&nbsp;Kwitansi sudah diupload tapi belum diverifikasi oleh petugas
+                </li>
+                {% elif rg.verified_status == 1 %}
+                <li class="list-group-item list-group-item-success">
+                    <i class="bi bi-check2-square"></i>&nbsp;Kwitansi sudah diupload dan sudah Diverifikasi oleh petugas
+                </li>
+                {% else %}
+                <li class="list-group-item list-group-item-success">
+                   <i class="bi bi-x-square"></i>&nbsp;Kwitansi tidak valid
+                </li>
+                {% endif %}
+                <li class="list-group-item list-group-item-{{ 'success' if status.upload_foto else 'danger' }}">
+                {% if status.upload_foto %} 
+                    <i class="bi bi-check2-square"></i>&nbsp;Foto sudah di upload 
+                {% else %}
+                    <i class="bi bi-x-square"></i>&nbsp;Foto belum diupload
+                {%endif%}
+                </li>
+                <li class="list-group-item list-group-item-{{ 'success' if status.data_diri else 'danger' }}">
+                {% if status.data_diri %} 
+                    <i class="bi bi-check2-square"></i>&nbsp;Data Pendaftar Sudah Diisi 
+                {% else %}
+                    <i class="bi bi-x-square"></i>&nbsp;Data Pendaftar Belum Diisi
+                {%endif%}
+                </li>
+                <li class="list-group-item list-group-item-{{ 'success' if status.data_ayah else 'danger' }}">
+                {% if status.data_ayah %} 
+                    <i class="bi bi-check2-square"></i>&nbsp;Data Ayah Sudah Diisi
+                {% else %}
+                    <i class="bi bi-x-square"></i>&nbsp;Data Ayah Belum Diisi
+                {%endif%}
+                </li>
+                <li class="list-group-item list-group-item-{{ 'success' if status.data_ibu else 'danger' }}">
+                {% if status.data_ibu %} 
+                    <i class="bi bi-check2-square"></i>&nbsp;Data Ibu Sudah Diisi
+                {% else %}
+                    <i class="bi bi-x-square"></i>&nbsp;Data Ibu Belum Diisi
+                {%endif%}
+                </li>
+                <li class="list-group-item list-group-item-{{ 'success' if status.data_wali else 'warning' }}">
+                {% if status.data_wali %} 
+                    <i class="bi bi-check2-square"></i>&nbsp;Data Wali Sudah Diisi
+                {% else %}
+                    <i class="bi bi-x-square"></i>&nbsp;Data Wali Belum Diisi (tidak wajib)
+                {%endif%}
+                </li>
+                <li class="list-group-item list-group-item-{{ 'success' if status.surat_pernyataan else 'danger' }}">
+                {% if status.surat_pernyataan %} 
+                    <i class="bi bi-check2-square"></i>&nbsp;Surat Pernyataan Sudah Diisi 
+                {% else %}
+                    <i class="bi bi-x-square"></i>&nbsp;Surat Pernyataan Belum Diisi
+                {%endif%}
+                </li>
+                <li class="list-group-item"></li>
             </ul>
         </div>
         </div>
