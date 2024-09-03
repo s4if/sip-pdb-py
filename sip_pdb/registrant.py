@@ -452,6 +452,7 @@ def isi_pernyataan():
             if 'q3' in request.form:
                 qurban.append(str(tahun_masuk+2))
             rg.qurban = ';'.join(qurban) if qurban != [] else ''
+            rg.set_reg_id() # reg_id di set setelah ada surat pernyataan dan di re-set di finalisasi
             db.session.add(rg)
             db.session.commit()
             prev_url = url_for('registrant.isi_ortu', tipe='ibu')
@@ -795,7 +796,7 @@ def download_kartu_pendaftaran():
     from flask_weasyprint import HTML, render_pdf
     import base64
     rg = Registrant.query.filter_by(id=session['user_id']).first()
-    
+    rg.set_reg_id() # temporary
     rgd = RegistrantData.query.filter_by(id=session['user_id']).first()
     parent_data = {}
     fd = Parent.query.filter_by(id=str(session['user_id'])+'_ayah').first()
@@ -815,12 +816,16 @@ def download_kartu_pendaftaran():
     
     datadir = os.path.join(uploaddir, str(session['username']))
     foto_path = os.path.join(datadir, f'{session["user_id"]}_foto.png')
-    with open(foto_path, 'rb') as f:
-        foto_data = f.read()
-    foto_img = base64.b64encode(foto_data).decode('utf-8')
+    foto_img = ""
+    if os.path.isfile(foto_path) and not os.path.isdir(foto_path):
+        with open(foto_path, 'rb') as f:
+            foto_data = f.read()
+        foto_str = base64.b64encode(foto_data).decode('utf-8')
+        foto_img = f"data:image/png;base64,{foto_str}"
+        
     str_isi = render_template('registrant/kartu_pendaftaran.jinja',
                            bg_img=bg_img,
-                           foto_img=f"data:image/png;base64,{foto_img}",
+                           foto_img=foto_img,
                            rg=rg,
                            rgd=rgd, 
                            pd=parent_data)
@@ -847,6 +852,7 @@ def download_surat_pernyataan():
     biaya_tetap = PDB_CONFIG['biaya_tetap']
     tahun_masuk = PDB_CONFIG['tahun_masuk']
     rg = Registrant.query.filter_by(id=session['user_id']).first()
+    rg.set_reg_id() # temporary build reg_id
     dct_parent = {'father':'ayah', 'mother':'ibu', 'guardian':'wali'}
     type = dct_parent[rg.main_parent]
     parent = Parent.query.filter_by(id=str(session['user_id'])+'_'+type).first()
