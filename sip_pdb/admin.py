@@ -52,12 +52,16 @@ def ganti_password():
 @bp.route('/lihat_pendaftar', methods=['GET'])
 @admin_required
 def lihat_pendaftar():
+    from .forms import RegisterForm
     notif = {}
+    dl_form = RegisterForm()
+    dl_form.selection_path.choices.append(('Semua', 'Semua'))
+    dl_form.program.choices.append(('Semua', 'Semua'))
     fl_msg = get_flashed_messages(with_categories=True)
     for category, message in fl_msg:
         notif[category] = message
         
-    return render_template('admin/lihat_pendaftar.jinja', admin_name=session['admin_name'], is_htmx=htmx, **notif)
+    return render_template('admin/lihat_pendaftar.jinja', dl_form=dl_form, admin_name=session['admin_name'], is_htmx=htmx, **notif)
 
 @bp.route('/lihat_pendaftar/<int:reg_id>', methods=['GET'])
 @admin_required

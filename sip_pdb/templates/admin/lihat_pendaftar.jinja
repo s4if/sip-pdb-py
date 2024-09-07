@@ -21,6 +21,12 @@
 
 <div class="row">
 <div class="col">
+<button class="btn btn-primary" onclick="show_download_modal()">Download Excel</button>
+</div>
+</div>
+
+<div class="row">
+<div class="col">
 <table id="tabel_utama" class="table table-striped table-sm" style="width:100%">
     <thead>
         <tr>
@@ -63,6 +69,31 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="download_excel_modal" tabindex="-1" aria-labelledby="download_excel_modal_label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="download_excel_modal_label">Download Excel</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('export.data_pendaftar') }}" method="post" hx-boost="false">
+          {{ dl_form.csrf_token }}
+          <div class="mb-3">
+          <label class="form-label">Jalur Seleksi Pendaftaran</label>
+              {{ dl_form.selection_path(class="form-select") }}
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Program Pendidikan</label>
+              {{ dl_form.program(class="form-select") }}
+          </div>
+          <button type="submit" class="btn btn-primary"><i class="bi bi-download"></i> Download</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 $( document ).ready(function() {
     new DataTable('#tabel_utama', {
@@ -75,6 +106,10 @@ $( document ).ready(function() {
         ]
     });
 });
+var show_download_modal = () => {
+  let download_modal = new bootstrap.Modal(document.getElementById('download_excel_modal'))
+  download_modal.show();
+};
 var del_modal = (reg_id) => {
     // TODO: Kasih nama/username? via ajax? atau htmx?
     document.getElementById('confirm_delete_content').innerText = "Apakah anda yakin menghapus user dengan id " + reg_id.toString();
