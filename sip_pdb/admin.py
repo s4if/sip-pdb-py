@@ -121,10 +121,13 @@ def data_pendaftar():
             Registrant.cp.label('no_telp'), #10
             father.contact.label('no_telp_ayah'), #11
             mother.contact.label('no_telp_ibu') #12
-        ).all()
+        ).order_by(Registrant.id).all()
     data = []
+    n = 1
     for row in result:
         item = []
+        item.append(n)
+        n+=1
         item.append(row.reg_id)
         item.append(row.username)
         item.append(row.name)
