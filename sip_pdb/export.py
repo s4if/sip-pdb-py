@@ -34,9 +34,9 @@ def data_pendaftar():
         return redirect(url_for('admin.lihat_pendaftar'))
     
     if selection_path != 'Semua':
-        qry.filter(rg.selection_path == selection_path)
+        qry = qry.filter(rg.selection_path == selection_path)
     if program != 'Semua':
-       qry.filter(rg.program == program)
+       qry = qry.filter(rg.program == program)
     
     result = qry.filter(rg.deleted == False).with_entities(
         # urutan di excel tergantung urutan di sini
@@ -154,11 +154,7 @@ def data_pendaftar():
             gd.burden_count.label('gd_burden_count'), #DH
         ).order_by(rg.id).all()
     
-    data = []
-    for row in result:
-        data.append(tuple(row))
-    
-    file_content = buat_konten(data)
+    file_content = buat_konten(result)
     return send_file(io.BytesIO(file_content), as_attachment=True, download_name='data_pendaftar.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     #return jsonify(data)
     
@@ -180,48 +176,133 @@ def buat_konten(data):
     ws['CV4'].alignment = Alignment(horizontal="center", vertical="center")
     
     labels = [
-        'Nomor Pendaftaran',
-        'Nama',
-        'L/P',
-        'Sekolah Asal',
-        'NISN',
-        'No. Telp',
-        'Program',
-        'Jalur Seleksi',
-        'Tahun Masuk',
-        'Gelombang',
-        'Uang Pendaftaran',
-        'SPP Bulanan',
-        'Wakaf Tanah',
-        'Tahun Qurban',
-        'No. Induk Kependudukan',
-        'No. Kartu keluarga',
-        'No. Akte Kelahiran',
-        'Tempat Lahir',
-        'Tanggal Lahir',
-        'Anak Ke',
-        'Dari Berapa Bersaudara',
-        'Dusun',
-        'RT',
-        'RW',
-        'Kelurahan/Desa',
-        'Kecamatan',
-        'Kota/Kabupaten',
-        'Provinsi',
-        'Kode Pos',
-        'Tinggal Bersama',
-        'Status Ortu',
-        'Kewarganegaraan',
-        'Agama',
-        'Tinggi',
-        'Berat',
-        'Lingkar Kepala',
-        'Hobi',
-        'Riwayat Penyakit',
-        'Kelainan Jasmani'
-        # TODO: Data Orang Tua
+        ('reg_id', 'Nomor Pendaftaran'),
+        ('name', 'Nama'),
+        ('gender', 'P/L'),
+        ('prev_school', 'Sekolah Asal'),
+        ('nisn', 'NISN'),
+        ('cp', 'Kontak Utama/Pendaftar'),
+        ('program', 'Program'),
+        ('selection_path', 'Jalur Seleksi Pendaftaran'),
+        ('entry_year', 'Tahun Masuk'),
+        ('gelombang', 'Gelombang'),
+        ('initial_cost', 'Uang Pangkal'),
+        ('monthly_cost', 'SPP'),
+        ('land_donation', 'Wakaf Tanah'),
+        ('qurban', 'Tahun Qurban'),
+        ('nik', 'No. Induk Kependudukan'),
+        ('nkk', 'No. Kartu Keluarga'),
+        ('nak', 'No. Akte Pendaftaran'),
+        ('birth_place', 'Tempat Lahir'),
+        ('birth_date', 'Tgl. Lahir'),
+        ('birth_order', 'Anak Ke'),
+        ('siblings_count', 'Dari .. Bersaudara'),
+        ('street', 'Dusun/Jalan'),
+        ('rt', 'rt'),
+        ('rw', 'rw'),
+        ('village', 'Desa/Kelurahan'),
+        ('district', 'Kecamatan'),
+        ('city', 'Kota/Kabupaten'),
+        ('province', 'Provinsi'),
+        ('country', 'Negara'),
+        ('postal_code', 'Kode Post'),
+        ('stay_with', 'Tinggal Bersama'),
+        ('parent_status', 'Status Orang Tua'),
+        ('nationality', 'Kewarganegaraan'),
+        ('religion', 'Agama'),
+        ('height', 'Tinggi'),
+        ('weight', 'Berat'),
+        ('head_size', 'Lingkar Kepala'),
+        ('hobbies', 'Hobi'),
+        ('hospital_sheets', 'Catatan Kesehatan'),
+        ('physical_abnormalities', 'Kelainan Fisik'), #AN
+        ('ft_name', 'Nama Ayah'),
+        ('ft_nik', 'NIK Ayah'),
+        ('ft_status', 'Status Ayah'),
+        ('ft_birth_place', 'Tempat Lahir'),
+        ('ft_birth_date', 'Tanggal Lahir'),
+        ('ft_street', 'Dusun/Jalan'),
+        ('ft_rt', 'RT'),
+        ('ft_rw', 'RW'),
+        ('ft_village', 'Desa/Kelurahan'),
+        ('ft_district', 'Kecamatan'),
+        ('ft_city', 'Kota/Kabupaten'),
+        ('ft_province', 'Provinsi'),
+        ('ft_country', 'Negara'),
+        ('ft_postal_code', 'Kode Pos'),
+        ('ft_contact', 'Kontak Ayah'),
+        ('ft_relation', 'Hub. dengan Pendaftar'),
+        ('ft_nationality', 'Kewarganegaraan'),
+        ('ft_religion', 'Agama'),
+        ('ft_education_level', 'Pendidikan Terakhir'),
+        ('ft_job', 'Pekerjaan'),
+        ('ft_position', 'Jabatan/Posisi'),
+        ('ft_company', 'Tempat Kerja/Perusahaan'),
+        ('ft_income', 'Penghasilan Bulanan'),
+        ('ft_burden_count', 'Jumlah Tanggungan'), #BL
+        ('mt_name', 'Nama Ibu'),
+        ('mt_nik', 'NIK Ibu'),
+        ('mt_status', 'Status Ibu'),
+        ('mt_birth_place', 'Tempat Lahir'),
+        ('mt_birth_date', 'Tgl. Lahir'),
+        ('mt_street', 'Dusun/Jalan'),
+        ('mt_rt', 'RT'),
+        ('mt_rw', 'RW'),
+        ('mt_village', 'Desa/Kelurahan'),
+        ('mt_district', 'Kecamatan'),
+        ('mt_city', 'Kota/Kabupaten'),
+        ('mt_province', 'Provinsi'),
+        ('mt_country', 'Negara'),
+        ('mt_postal_code', 'Kode Pos'),
+        ('mt_contact', 'Kontak Ibu'),
+        ('mt_relation', 'Hub. dengan Pendaftar'),
+        ('mt_nationality', 'Kewarganegaraan'),
+        ('mt_religion', 'Agama'),
+        ('mt_education_level', 'Pendidikan Terakhir'),
+        ('mt_job', 'Pekerjaan'),
+        ('mt_position', 'Jabatan/Posisi'),
+        ('mt_company', 'Tempat Kerja/Perusahaan'),
+        ('mt_income', 'Penghasilan Bulanan'),
+        ('mt_burden_count', 'Jumlah Tanggungan'), #CU
+        ('gd_name', 'Nama Wali'),
+        ('gd_nik', 'NIK Wali'),
+        ('gd_status', 'Status Wali'),
+        ('gd_birth_place', 'Tempat Lahir'),
+        ('gd_birth_date', 'Tgl. Lahir'),
+        ('gd_street', 'Dusun/Jalan'),
+        ('gd_rt', 'RT'),
+        ('gd_rw', 'RW'),
+        ('gd_village', 'Desa/Kelurahan'),
+        ('gd_district', 'Kecamatan'),
+        ('gd_city', 'Kota/Kabupaten'),
+        ('gd_province', 'Provinsi'),
+        ('gd_country', 'Negara'),
+        ('gd_postal_code', 'Kode Pos'),
+        ('gd_contact', 'Kontak Wali'),
+        ('gd_relation', 'Hub. dengan Pendaftar'),
+        ('gd_nationality', 'Kewarganegaraan'),
+        ('gd_religion', 'Agama'),
+        ('gd_education_level', 'Pendidikan Terakhir'),
+        ('gd_job', 'Pekerjaan'),
+        ('gd_position', 'Jabatan/Posisi'),
+        ('gd_company', 'Tempat Kerja/Perusahaan'),
+        ('gd_income', 'Penghasilan Bulanan'),
+        ('gd_burden_count', 'Jumlah Tanggungan'), #DH
     ]
-    ws.append(data) # Tidak Bisa
+    col = 1
+    row = 5
+    for _, label in labels:
+        ws.cell(row=row, column=col).value = label
+        col += 1
+    
+    row += 1
+    for row_data in data:
+        col = 1
+        for key, _ in labels:
+            ws.cell(row=row, column=col).value = getattr(row_data, key)
+            col += 1
+        row += 1
+        
     with NamedTemporaryFile(suffix='.xlsx') as tmp:
         wb.save(tmp.name)
         tmp.seek(0)
