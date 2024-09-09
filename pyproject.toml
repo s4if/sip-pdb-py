@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "sip-pdb-py"
+name = "sip-pdb"
 version = "0.1.0"
 description = ""
 authors = ["Saiful Habib <sangpejuang32@gmail.com>"]
@@ -28,3 +28,7 @@ openpyxl = "^3.1.5"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
