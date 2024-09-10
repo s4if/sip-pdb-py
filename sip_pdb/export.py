@@ -127,7 +127,7 @@ def data_pendaftar():
             mt.position.label('mt_position'),
             mt.company.label('mt_company'),
             mt.income.label('mt_income'),
-            mt.burden_count.label('mt_burden_count'), #CU
+            mt.burden_count.label('mt_burden_count'), #CJ
             gd.name.label('gd_name'),
             gd.nik.label('gd_nik'),
             gd.status.label('gd_status'),
@@ -169,11 +169,11 @@ def buat_konten(data):
     ws.merge_cells('AO4:BL4')
     ws['AO4'].alignment = Alignment(horizontal="center", vertical="center")
     ws['BM4'].value = 'Data Ibu'
-    ws.merge_cells('BM4:CU4')
+    ws.merge_cells('BM4:CJ4')
     ws['BM4'].alignment = Alignment(horizontal="center", vertical="center")
-    ws['CV4'].value = 'Data Wali'
-    ws.merge_cells('CV4:DH4')
-    ws['CV4'].alignment = Alignment(horizontal="center", vertical="center")
+    ws['CK4'].value = 'Data Wali'
+    ws.merge_cells('CK4:DI4')
+    ws['CK4'].alignment = Alignment(horizontal="center", vertical="center")
     
     labels = [
         ('reg_id', 'Nomor Pendaftaran'),
