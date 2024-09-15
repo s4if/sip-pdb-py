@@ -9,8 +9,6 @@ from .config import uploaddir
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
-# TODO: implementasi halaman lihat pendaftar dan dokumen
-# TODO: implementasi download excel
 # TODO: implementasi download dokumen pendaftar
 
 @bp.route('/')
@@ -80,7 +78,6 @@ def lihat_pendaftar_detail(reg_id):
     md = Parent.query.filter_by(id=str(reg_id)+'_ibu').first()
     wd = Parent.query.filter_by(id=str(reg_id)+'_wali').first()
     docs = Document.query.filter_by(registrant_id=reg_id).all()
-    ps_string = ['Bukti Pembayaran Tidak Valid', 'Belum di verifikasi', 'Bukti Pembayaran Berhasil Diverifikasi']
     status = {
         'upload_foto': pu,
         'data_diri': rgd,
@@ -151,6 +148,70 @@ def data_pendaftar():
         
     return jsonify({'data':data})
 
+@bp.route('/data_belum_bayar', methods=['GET'])
+@admin_required
+def data_belum_bayar():
+    from .models import Registrant
+    from sqlalchemy.orm import aliased
+    rows = Registrant.query.filter(Registrant.deleted == False).\
+        filter(Registrant.reg_fee <= 0).order_by(Registrant.id.desc()).all()
+    data = []
+    count = 1
+    for row in rows:
+        item = []
+        item.append(count)
+        count+=1
+        item.append(row.name)
+        item.append(row.prev_school)
+        item.append(row.cp)
+        data.append(item)
+        
+    return jsonify({'data':data})
+
+@bp.route('/data_belum_lengkap', methods=['GET'])
+@admin_required
+def data_belum_lengkap():
+    from .models import Registrant, RegistrantData, Parent
+    from sqlalchemy.orm import aliased
+    rgd = aliased(RegistrantData)
+    father = aliased(Parent)
+    mother = aliased(Parent)
+    rows = db.session.query(Registrant).\
+        outerjoin(rgd, Registrant.registrant_data_id == rgd.id).\
+        outerjoin(father, Registrant.father_id == father.id).\
+        outerjoin(mother, Registrant.mother_id == mother.id).\
+        filter(Registrant.deleted == False).with_entities(
+            Registrant.id.label('id'),
+            Registrant.name.label('name'),
+            Registrant.username.label('username'),
+            Registrant.prev_school.label('prev_school'),
+            Registrant.cp.label('cp'),
+            Registrant.finalized.label('finalized'),
+            rgd.nik.label('nik'),
+            father.name.label('father_name'),
+            mother.name.label('mother_name'),
+        ).order_by(Registrant.id.desc()).all()
+    data = []
+    count = 1
+    for row in rows:
+        item = []
+        item.append(count)
+        count+=1
+        item.append(row.name)
+        item.append(row.prev_school)
+        item.append(row.cp)
+        datadir = os.path.join(uploaddir, row.username)
+        pu = os.path.isfile(os.path.join(datadir, f'{row.id}_foto.png'))
+        item.append('Sudah' if pu else 'Belum') # Upload Foto
+        item.append("Belum" if not row.nik else "Sudah") # Data Diri
+        item.append("Belum" if not row.father_name else "Sudah") # Data Ayah
+        item.append("Belum" if not row.mother_name else "Sudah") # Data Ibu
+        item.append("Sudah" if row.finalized else "Belum") # finalisasi
+        if not all((pu, row.nik, row.father_name, row.mother_name, row.finalized)):
+            data.append(item)
+        
+    return jsonify({'data':data})
+    
 @bp.route('/get_foto/<int:reg_id>/<string:tipe>')
 @admin_required
 def get_foto(reg_id, tipe):

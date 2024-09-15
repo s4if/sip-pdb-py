@@ -20,8 +20,80 @@
 <p>Ini Beranda</p>
 
 <div class="row">
+<div class="col-md-7">
+<div class="card w-100">
+    <div class="card-header">
+        Data Pendaftar Belum Membayar
+    </div>
+    <div class="card-body">
+        <table class="table table-sm table-striped table-bordered" id="tbl_blm_byr">
+        <thead>
+        <tr>
+            <th>No. </th>
+            <th>Nama</th>
+            <th>Asal Sekolah</th>
+            <th>Kontak</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+        </table>
+    </div>
+</div>
+</div>
+</div>
+
+<div class="row">
 <div class="col">
-TODO: Isi Beranda
+&nbsp;
+</div>
+</div>
+
+<div class="row">
+<div class="col">
+<div class="card w-100">
+    <div class="card-header">
+        Data Pendaftar Belum Selesai
+    </div>
+    <div class="card-body">
+        <table class="table table-sm table-striped table-bordered" id="tbl_blm_lkp">
+        <thead>
+        <tr>
+            <th>No. </th>
+            <th>Nama</th>
+            <th>Asal Sekolah</th>
+            <th>Kontak</th>
+            <th>Upload Foto</th>
+            <th>Data Diri</th>
+            <th>Data Ayah</th>
+            <th>Data Ibu</th>
+            <th>Finalisasi</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+        </table>
+    </div>
+</div>
+</div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#tbl_blm_lkp').DataTable({
+            "ajax": {
+                "url": "{{url_for('admin.data_belum_lengkap')}}"
+            },
+        });
+        $('#tbl_blm_byr').DataTable({
+            "ajax": {
+                "url": "{{url_for('admin.data_belum_bayar')}}"
+            },
+        });
+    });
+</script>
+
+<div class="row">
+<div class="col">
+&nbsp;
 </div>
 </div>
 {% endblock %}
