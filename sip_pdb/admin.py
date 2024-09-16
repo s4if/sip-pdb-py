@@ -1,6 +1,6 @@
 import datetime, os
 from flask import (
-    Blueprint, g, jsonify, render_template, request, session, url_for, redirect, flash, get_flashed_messages, send_from_directory
+    Blueprint, g, jsonify, send_file, render_template, request, session, url_for, redirect, flash, get_flashed_messages, send_from_directory
 )
 from sqlalchemy.exc import IntegrityError
 from .db import db
@@ -97,6 +97,36 @@ def lihat_pendaftar_detail(reg_id):
                            is_superadmin=session['is_superadmin'],
                            **notif
                         )
+    
+@bp.route('/download_dokumen_pendaftar/<int:reg_id>', methods=['GET'])
+@admin_required
+def download_dokumen_pendaftar(reg_id):
+    from .models import Registrant
+    import zipfile
+    
+    rg = Registrant.query.filter_by(id=reg_id).first()
+    if not rg: 
+        flash('Registrant tidak ditemukan', 'error')
+        return redirect(url_for('admin.lihat_pendaftar'))
+    
+    datadir = os.path.join(uploaddir, rg.username)
+    if not os.path.isdir(datadir):
+        flash('Folder dokumen pendaftar tidak ditemukan', 'error')
+        return redirect(url_for('admin.lihat_pendaftar'))
+    try:
+        zip_path = os.path.join(datadir, f'{rg.id}_{rg.username}.zip')
+        with zipfile.ZipFile(zip_path, 'w') as zf:
+            for root, dirs, files in os.walk(datadir):
+                for f in files:
+                    if f.endswith('.png') or f.endswith('.pdf'):
+                        zf.write(os.path.join(root, f), os.path.relpath(os.path.join(root, f), datadir))
+        return send_file(zip_path, as_attachment=True)
+    except Exception as e:
+        flash("Terjadi kesalahan saat membuat zip file", 'error')
+        return redirect(url_for('admin.lihat_pendaftar'))
+    finally:
+        if os.path.isfile(zip_path):
+            os.remove(zip_path)
 
 @bp.route('/data_pendaftar', methods=['GET'])
 @admin_required

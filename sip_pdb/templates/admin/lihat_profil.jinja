@@ -95,6 +95,9 @@
             <a class="btn btn-info" hx-boost="false"  href="{{url_for('registrant.download_kartu_pendaftaran_admin', reg_id=rg.id)}}">
             Unduh Kartu Pendaftaran</a>
             &nbsp;
+            <a class="btn btn-primary" hx-boost="false"  href="{{url_for('admin.download_dokumen_pendaftar', reg_id=rg.id)}}">
+            Unduh Semua Dokumen Pendaftar</a>
+            &nbsp;
             {% endif %}
             {% if status.surat_pernyataan %}
             <a class="btn btn-success" hx-boost="false"  href="{{url_for('registrant.download_surat_pernyataan_admin', reg_id=rg.id)}}">
