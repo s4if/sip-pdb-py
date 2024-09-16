@@ -164,6 +164,8 @@ def data_belum_bayar():
         item.append(row.name)
         item.append(row.prev_school)
         item.append(row.cp)
+        item.append('''<a class="btn btn-sm btn-primary" hx-boost="true" hx-target="#hx_content" 
+                        href="{}">Lihat</a>'''.format(url_for('admin.lihat_pendaftar_detail', reg_id=row.id)))
         data.append(item)
         
     return jsonify({'data':data})
@@ -207,6 +209,8 @@ def data_belum_lengkap():
         item.append("Belum" if not row.father_name else "Sudah") # Data Ayah
         item.append("Belum" if not row.mother_name else "Sudah") # Data Ibu
         item.append("Sudah" if row.finalized else "Belum") # finalisasi
+        item.append('''<a class="btn btn-sm btn-primary" hx-boost="true" hx-target="#hx_content" 
+                        href="{}">Lihat</a>'''.format(url_for('admin.lihat_pendaftar_detail', reg_id=row.id)))
         if not all((pu, row.nik, row.father_name, row.mother_name, row.finalized)):
             data.append(item)
         
