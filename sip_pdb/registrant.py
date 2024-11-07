@@ -423,18 +423,18 @@ def isi_pernyataan():
                                "{:,.0f}".format(bpm['infaq_pendidikan'] + 2000000).replace(",", ".") + ',-')
                 
         fv['scost'] = int(request.form['raw_scost'])
-        if fv['scost'] not in range(bpm['spp'], bpm['spp']+1000001):
+        if fv['scost'] not in range(bpm['spp'], bpm['spp']+200001): # hotfix spp
             fv['scost'] = int(request.form['other_scost'])
-            if fv['scost'] < bpm['spp'] + 1000000:
+            if fv['scost'] < bpm['spp'] + 200000: 
                 failure.append('Isian Khusus SPP tidak boleh kurang dari Rp. ' +
-                               "{:,.0f}".format(bpm['spp'] + 1000000).replace(",", ".") + ',-')
+                               "{:,.0f}".format(bpm['spp'] + 200000).replace(",", ".") + ',-')
                 
         fv['lcost'] = int(request.form['raw_lcost'])
-        if fv['lcost'] not in range(bpm['wakaf_tanah'], bpm['wakaf_tanah']+1000001):
+        if fv['lcost'] not in range(bpm['wakaf_tanah'], bpm['wakaf_tanah']+200001): # hotfix wakaf
             fv['lcost'] = int(request.form['other_lcost'])
-            if fv['lcost'] < bpm['wakaf_tanah'] + 1000000:
+            if fv['lcost'] < bpm['wakaf_tanah'] + 200000: 
                 failure.append('Isian Khusus Wakaf Tanah tidak boleh kurang dari Rp. ' +
-                               "{:,.0f}".format(bpm['wakaf_tanah'] + 1000000).replace(",", ".") + ',-')
+                               "{:,.0f}".format(bpm['wakaf_tanah'] + 200000).replace(",", ".") + ',-')
                 
         fv['main_parent'] = request.form['main_parent']
         if failure != []:
